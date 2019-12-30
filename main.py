@@ -217,16 +217,11 @@ def freeplay(dimRegion: Tuple[int, int], dimValues: RGB, towers: List[TOWER]) ->
 
 # Restart the game
 def restart(dimRegion: Tuple[int, int], dimValues: RGB, towers: List[TOWER], insta: str) -> None:
-    if (insta == 'BAD'):
-        LEVELUP = levelThread(dimRegion, dimValues, towers)
-        
+    if (insta == 'BAD'):        
         print('Determining if BAD has been defeated.')
         
         while (not determineDim(dimRegion, dimValues)):
             pass
-        
-        killThread(LEVELUP)
-        sleep(.1)
         
         print('BAD defeated. Determining if Insta Monkey screen has appeared.')
         
