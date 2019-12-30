@@ -33,6 +33,20 @@ class RGB:
     g: int
     b: int
     
+class lThread(Thread):
+    def __init__(self, target, region: Tuple[int, int], values: RGB, towers: List[TOWER], daemon: bool):
+        Thread.__init__(self)
+        self.do_run = True
+        self.target = target
+        self.region: Tuple[int, int] = region
+        self.values: RGB = values
+        self.towers: List[TOWER] = towers
+        self.daemon: bool = daemon
+    
+    def run(self):
+        level(self.region, self.values, self.towers)
+    
+    
 BOX: Tuple[int, int, int, int] = (0, 0, 1920, 1080)
 TOPBOX: Tuple[int, int] = (1424, 520)
 MIDBOX: Tuple[int, int] = (1424, 700)
@@ -152,6 +166,7 @@ def level(region: Tuple[int, int], values: RGB, towers: List[TOWER]) -> None:
             for tower in towers:
                 if (tower.currentMonkey):
                     gameClick(tower, 1)
+                    press('space')
         
         moveTo(1470, 298)
         click(1470, 298)
@@ -166,8 +181,8 @@ def adoraAbilities() -> None:
         press('3')
 
 # Create and start the leveling up thread
-def levelThread(region: Tuple[int, int], values: RGB, towers: List[TOWER]) -> Thread:
-    levelUp = Thread(target = level, args = (region, values, towers), daemon = True)
+def levelThread(region: Tuple[int, int], values: RGB, towers: List[TOWER]) -> lThread:
+    levelUp = lThread(level, region, values, towers, True)
     levelUp.start()
     return levelUp
 
@@ -177,9 +192,13 @@ def adoraThread() -> Thread:
     aThread.start()
     return aThread
 
-# Kill a thread
-def killThread(thread: Thread) -> None:
+# Kill the level thread
+def killLevelThread(thread: lThread) -> None:
     thread.do_run = False
+    thread.join()
+    
+# Kill the ability thread
+def killAbilityThread(thread: Thread) -> None:
     thread.join()
 
 # Set the current monkey being upgraded
@@ -192,14 +211,14 @@ def setCurrentMonkey(tower: TOWER, towers: List[TOWER]) -> None:
 
 # Deal with the freeplay button
 def freeplay(dimRegion: Tuple[int, int], dimValues: RGB, towers: List[TOWER]) -> None:
-    LEVELUP = levelThread(dimRegion, dimValues, towers)
+    LEVELUP: lThread = levelThread(dimRegion, dimValues, towers)
     
     print('Determining if MOAB has been defeated.')
     
     while (not determineDim(dimRegion, dimValues)):
         pass
     
-    killThread(LEVELUP)
+    killLevelThread(LEVELUP)
     
     print('MOAB defeated. Determining if VICTORY screen has appeared.')
     
