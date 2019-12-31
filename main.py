@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Author   : Matthew Moore
-Revision : 2019-12-29
+Revision : 2019-12-30
 Date     : 2019-12-28
 """
 
@@ -135,10 +135,19 @@ def determineDim(region: Tuple[int, int], values: RGB) -> bool:
     IMAGE: Tuple[int, int, int] = getImage().getpixel(region)
     return ((IMAGE[0] <= values.r) and (IMAGE[1] <= values.g) and (IMAGE[2] <= values.b))
 
+# Print out what tower is being bought next
+def nextTower(tower: TOWER) -> None:
+    print(f'Waiting on {tower.name} availability.')
+    
 # Print out what tower is being placed at which (x, y)
 def placing(tower: TOWER) -> None:
     print(f'Placing {tower.name} at ({tower.x}, {tower.y})')
 
+# Print out the what upgrade is getting bought next
+def nextUpgrade(tower: TOWER, currentPath: int) -> None:
+    if (tower.currentUpgrades is not None):
+        print(f'Waiting on {tower.name} {"-".join([str(tower.currentUpgrades[i] + 1) if (currentPath == i) else (str(tower.currentUpgrades[i])) for i in range(len(tower.currentUpgrades))])}.')
+        
 # Print out the current upgrade path of the given tower
 def upgrades(tower: TOWER) -> None:
     if (tower.currentUpgrades is not None):
@@ -159,6 +168,9 @@ def level(region: Tuple[int, int], values: RGB, towers: List[TOWER]) -> None:
     t = currentThread()
     while getattr(t, "do_run", True):
         if (determineDim(region, values)):
+            
+            print('Level up detected. Attempting to clear and continue program...')
+            
             for tower in towers:
                 if (tower.currentMonkey):
                     for i in range(2):
