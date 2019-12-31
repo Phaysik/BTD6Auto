@@ -28,6 +28,7 @@ ALLTOWERS: List[TOWER] = [
 
 DIM: Tuple[int, int] = (511, 1062)
 DIMVALUES: RGB = RGB(r = 51, g = 67, b = 30)
+ABILITIES: List[str] = ['1', '3']
 
 # Place down Adora
 def adora() -> None:    
@@ -49,7 +50,7 @@ def dart() -> None:
     gamePress('q', 1)
     gameClick(DART, 2)
     
-    levelUp: lThread = levelThread(DIM, DIMVALUES, ALLTOWERS)
+    levelUp: gameThread = levelThread(DIM, DIMVALUES, ALLTOWERS)
     
     if (DART.path is not None and DART.currentUpgrades is not None):
         for i in range(DART.path[1]):
@@ -68,19 +69,19 @@ def dart() -> None:
             upgrades(DART)
             gamePress('/', 1)
             
-    killLevelThread(levelUp)
+    killThread(levelUp)
     
 # Place and upgrade the Super Monkey
 def superMonkey(call: int) -> None:
     if (call == 1):
         gameScroll(-1)
         
-        levelUp: lThread = levelThread(DIM, DIMVALUES, ALLTOWERS)
+        levelUp: gameThread = levelThread(DIM, DIMVALUES, ALLTOWERS)
         
         while (not determineMonkey(SUPER)):
             pass
         
-        killLevelThread(levelUp)
+        killThread(levelUp)
         
         setCurrentMonkey(SUPER, ALLTOWERS)
         placing(SUPER)
@@ -106,7 +107,7 @@ def superMonkey(call: int) -> None:
                 upgrades(SUPER)
                 gamePress(',', 1)
                 
-        killLevelThread(levelUp)
+        killThread(levelUp)
     else:
         gameClick(SUPER, 1)
         setCurrentMonkey(SUPER, ALLTOWERS)
@@ -122,18 +123,18 @@ def superMonkey(call: int) -> None:
                 upgrades(SUPER)
                 gamePress('/', 1)
         
-        killLevelThread(levelUp)
+        killThread(levelUp)
 
 # Place and upgrade the Tack Shooter
 def tack() -> None:
     gameScroll(1)
     
-    levelUp: lThread = levelThread(DIM, DIMVALUES, ALLTOWERS)
+    levelUp: gameThread = levelThread(DIM, DIMVALUES, ALLTOWERS)
     
     while (not determineMonkey(TACK)):
         pass
     
-    killLevelThread(levelUp)
+    killThread(levelUp)
     
     setCurrentMonkey(TACK, ALLTOWERS)
     placing(TACK)
@@ -159,18 +160,18 @@ def tack() -> None:
             upgrades(TACK)
             gamePress('/', 1)
             
-        killLevelThread(levelUp)
+        killThread(levelUp)
 
 # Place and upgrade the Monkey Village
 def village() -> None:
     gameScroll(-1)
     
-    levelUp: lThread = levelThread(DIM, DIMVALUES, ALLTOWERS)
+    levelUp: gameThread = levelThread(DIM, DIMVALUES, ALLTOWERS)
     
     while (not determineMonkey(VILLAGE)):
         pass
     
-    killLevelThread(levelUp)
+    killThread(levelUp)
     
     setCurrentMonkey(VILLAGE, ALLTOWERS)
     placing(VILLAGE)
@@ -196,18 +197,18 @@ def village() -> None:
             upgrades(VILLAGE)
             gamePress('.', 1)
             
-        killLevelThread(levelUp)
+        killThread(levelUp)
 
 # Place and upgrade the Alchemist Monkey
 def alchemist() -> None:
     gameScroll(-1)
     
-    levelUp: lThread = levelThread(DIM, DIMVALUES, ALLTOWERS)
+    levelUp: gameThread = levelThread(DIM, DIMVALUES, ALLTOWERS)
         
     while (not determineMonkey(ALCHEMIST)):
         pass
     
-    killLevelThread(levelUp)
+    killThread(levelUp)
     
     setCurrentMonkey(ALCHEMIST, ALLTOWERS)
     placing(ALCHEMIST)
@@ -233,7 +234,7 @@ def alchemist() -> None:
             upgrades(ALCHEMIST)
             gamePress('/', 1)
         
-    killLevelThread(levelUp)
+    killThread(levelUp)
 
 # 40 rounds for non-decreased xp
 def xp() -> None:
@@ -254,14 +255,14 @@ def xp() -> None:
         gamePress('space', 2)
         adora()
         
-        ability = adoraThread()
+        ability = abilityThread(ABILITIES)
         
         dart()        
         superMonkey(1)
         freeplay(DIM, DIMVALUES, ALLTOWERS)
         restart(DIM, DIMVALUES, ALLTOWERS, 'RESTART')
         
-        killAbilityThread(ability)
+        killThread(ability)
         
         sleep(3)
         iteration += 1
@@ -284,7 +285,7 @@ def insta() -> None:
         gamePress('space', 2)
         adora()
         
-        ability = adoraThread()
+        ability = abilityThread(ABILITIES)
         
         dart()
         superMonkey(1)
@@ -296,7 +297,7 @@ def insta() -> None:
         superMonkey(2)
         restart(DIM, DIMVALUES, ALLTOWERS, 'BAD')
         
-        killAbilityThread(ability)
+        killThread(ability)
         
         sleep(3)
         iteration += 1

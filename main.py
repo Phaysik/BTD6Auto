@@ -33,18 +33,14 @@ class RGB:
     g: int
     b: int
     
-class lThread(Thread):
-    def __init__(self, target, region: Tuple[int, int], values: RGB, towers: List[TOWER], daemon: bool):
-        Thread.__init__(self)
+class gameThread(Thread):
+    def __init__(self, target, daemon: bool, args: Union[Tuple[Tuple[int, int], RGB, List[TOWER]], List[str]]):
+        if (isinstance(args, list)):
+            Thread.__init__(self, target = target, args = [args], daemon = daemon)
+        elif (isinstance(args, tuple)):
+            Thread.__init__(self, target = target, args = args, daemon = daemon)
+            
         self.do_run = True
-        self.target = target
-        self.region: Tuple[int, int] = region
-        self.values: RGB = values
-        self.towers: List[TOWER] = towers
-        self.daemon: bool = daemon
-    
-    def run(self):
-        level(self.region, self.values, self.towers)
     
     
 BOX: Tuple[int, int, int, int] = (0, 0, 1920, 1080)
@@ -165,40 +161,37 @@ def level(region: Tuple[int, int], values: RGB, towers: List[TOWER]) -> None:
         if (determineDim(region, values)):
             for tower in towers:
                 if (tower.currentMonkey):
+                    for i in range(2):
+                        sleep(.2)
+                        moveTo(1470, 298)
+                        click(1470, 298)
+                        
                     gameClick(tower, 1)
                     press('space')
-        
-        moveTo(1470, 298)
-        click(1470, 298)
-        sleep(.2)
-        
+                    
 # Activate Adora's first and third abilities when available
-def adoraAbilities() -> None:
+def gameAbilities(abilities: List[str]) -> None:
     t = currentThread()
     while getattr(t, "do_run", True):
         sleep(.1)
-        press('1')
-        press('3')
+        for number in abilities:
+            press(str(number))
 
 # Create and start the leveling up thread
-def levelThread(region: Tuple[int, int], values: RGB, towers: List[TOWER]) -> lThread:
-    levelUp = lThread(level, region, values, towers, True)
+def levelThread(region: Tuple[int, int], values: RGB, towers: List[TOWER]) -> gameThread:
+    levelUp: gameThread = gameThread(level, True, (region, values, towers))
     levelUp.start()
     return levelUp
 
 # Create and start the Adora's abilities thread
-def adoraThread() -> Thread:
-    aThread = Thread(target = adoraAbilities, daemon = True)
-    aThread.start()
-    return aThread
+def abilityThread(abilities: List[str]) -> gameThread:
+    ability: gameThread = gameThread(gameAbilities, True, abilities)
+    ability.start()
+    return ability
 
-# Kill the level thread
-def killLevelThread(thread: lThread) -> None:
+# Kill the requested thread
+def killThread(thread: gameThread) -> None:
     thread.do_run = False
-    thread.join()
-    
-# Kill the ability thread
-def killAbilityThread(thread: Thread) -> None:
     thread.join()
 
 # Set the current monkey being upgraded
@@ -211,14 +204,14 @@ def setCurrentMonkey(tower: TOWER, towers: List[TOWER]) -> None:
 
 # Deal with the freeplay button
 def freeplay(dimRegion: Tuple[int, int], dimValues: RGB, towers: List[TOWER]) -> None:
-    LEVELUP: lThread = levelThread(dimRegion, dimValues, towers)
+    LEVELUP: gameThread = levelThread(dimRegion, dimValues, towers)
     
     print('Determining if MOAB has been defeated.')
     
     while (not determineDim(dimRegion, dimValues)):
         pass
     
-    killLevelThread(LEVELUP)
+    killThread(LEVELUP)
     
     print('MOAB defeated. Determining if VICTORY screen has appeared.')
     
