@@ -12,7 +12,7 @@ from main import *
 
 # CONSTS
 ADORA: TOWER = TOWER(x = 474, y = 406, location = (1754, 215), mType = 'HERO', name = 'Adora', currentMonkey = False)
-DART: TOWER = TOWER(x = 591, y = 403, location = (1888, 215), mType = 'NORMAL', name = 'Dart Monkey', currentMonkey = False, path = (0, 3, 2), currentUpgrades = [0, 0, 0])
+DART: TOWER = TOWER(x = 591, y = 403, location = (1888, 215), mType = 'NORMAL', name = 'Dart Monkey', currentMonkey = True, path = (0, 3, 2), currentUpgrades = [0, 0, 0])
 SUPER: TOWER = TOWER(x = 616, y = 513, location = (1751, 313), mType = 'MAGIC', name = 'Super Monkey', currentMonkey = False, path = (2, 0, 4), currentUpgrades = [0, 0, 0])
 TACK: TOWER = TOWER(x = 476, y = 495, location = (1749, 533), mType = 'NORMAL', name = 'Tack Shooter', currentMonkey = False, path = (2, 0, 5), currentUpgrades = [0, 0, 0])
 VILLAGE: TOWER = TOWER(x = 382, y = 513, location = (1745, 794), mType = 'SUPPORT', name = 'Monkey Village', currentMonkey = False, path = (3, 2, 0), currentUpgrades = [0, 0, 0])
@@ -54,7 +54,7 @@ def dart() -> None:
     gamePress('q', 1)
     gameClick(DART, 2)
     
-    levelUp: gameThread = levelThread(DIM, DIMVALUES, ALLTOWERS)
+    levelUp: gameThread = levelThread(ALLTOWERS)
     
     if (DART.path is not None and DART.currentUpgrades is not None):
         for i in range(DART.path[1]):
@@ -84,7 +84,7 @@ def superMonkey(call: int) -> None:
     if (call == 1):
         gameScroll(-1)
         
-        levelUp: gameThread = levelThread(DIM, DIMVALUES, ALLTOWERS)
+        levelUp: gameThread = levelThread(ALLTOWERS)
         
         nextTower(SUPER)
         
@@ -98,7 +98,7 @@ def superMonkey(call: int) -> None:
         gamePress('s', 1)
         gameClick(SUPER, 2)
         
-        levelUp = levelThread(DIM, DIMVALUES, ALLTOWERS)
+        levelUp = levelThread(ALLTOWERS)
         
         if (SUPER.path is not None and SUPER.currentUpgrades is not None):
             for i in range(SUPER.path[2] - 2):
@@ -126,7 +126,7 @@ def superMonkey(call: int) -> None:
         gameClick(SUPER, 1)
         setCurrentMonkey(SUPER, ALLTOWERS)
         
-        levelUp = levelThread(DIM, DIMVALUES, ALLTOWERS)
+        levelUp = levelThread(ALLTOWERS)
         
         if (SUPER.path is not None and SUPER.currentUpgrades is not None):
             for i in range(SUPER.path[2] - 2):
@@ -145,7 +145,7 @@ def superMonkey(call: int) -> None:
 def tack() -> None:
     gameScroll(1)
     
-    levelUp: gameThread = levelThread(DIM, DIMVALUES, ALLTOWERS)
+    levelUp: gameThread = levelThread(ALLTOWERS)
     
     nextTower(TACK)
     
@@ -159,7 +159,7 @@ def tack() -> None:
     gamePress('r', 1)
     gameClick(TACK, 2)
     
-    levelUp = levelThread(DIM, DIMVALUES, ALLTOWERS)
+    levelUp = levelThread(ALLTOWERS)
     
     if (TACK.path is not None and TACK.currentUpgrades is not None):
         for i in range(TACK.path[0]):
@@ -188,7 +188,7 @@ def tack() -> None:
 def village() -> None:
     gameScroll(-1)
     
-    levelUp: gameThread = levelThread(DIM, DIMVALUES, ALLTOWERS)
+    levelUp: gameThread = levelThread(ALLTOWERS)
     
     nextTower(VILLAGE)
     
@@ -202,7 +202,7 @@ def village() -> None:
     gamePress('k', 1)
     gameClick(VILLAGE, 2)
     
-    levelUp = levelThread(DIM, DIMVALUES, ALLTOWERS)
+    levelUp = levelThread(ALLTOWERS)
     
     if (VILLAGE.path is not None and VILLAGE.currentUpgrades is not None):
         for i in range(VILLAGE.path[0]):
@@ -231,7 +231,7 @@ def village() -> None:
 def alchemist() -> None:
     gameScroll(-1)
     
-    levelUp: gameThread = levelThread(DIM, DIMVALUES, ALLTOWERS)
+    levelUp: gameThread = levelThread(ALLTOWERS)
     
     nextTower(ALCHEMIST)
     
@@ -245,7 +245,7 @@ def alchemist() -> None:
     gamePress('f', 1)
     gameClick(ALCHEMIST, 2)
     
-    levelUp = levelThread(DIM, DIMVALUES, ALLTOWERS)
+    levelUp = levelThread(ALLTOWERS)
     
     if (ALCHEMIST.path is not None and ALCHEMIST.currentUpgrades is not None):
         for i in range(ALCHEMIST.path[0] - 1):

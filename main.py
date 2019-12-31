@@ -34,12 +34,8 @@ class RGB:
     b: int
     
 class gameThread(Thread):
-    def __init__(self, target, daemon: bool, args: Union[Tuple[Tuple[int, int], RGB, List[TOWER]], List[str]]):
-        if (isinstance(args, list)):
-            Thread.__init__(self, target = target, args = [args], daemon = daemon)
-        elif (isinstance(args, tuple)):
-            Thread.__init__(self, target = target, args = args, daemon = daemon)
-            
+    def __init__(self, target, daemon: bool, args: Union[List[TOWER], List[str]]):
+        Thread.__init__(self, target = target, args = [args], daemon = daemon)
         self.do_run = True
     
     
@@ -62,6 +58,8 @@ HOME: Tuple[int, int] = (803, 866)
 HOMEVALUES: RGB = RGB(20, 210, 240)
 BAD: Tuple[int, int] = (1212, 673)
 BADVALUES: RGB = RGB(r = 230, g = 105, b = 35)
+LEVEL: Tuple[int, int] = (170, 876)
+LEVELVALUES: RGB = RGB(180, 100, 50)
 
 def windowEnumerationHandler(hwnd, top_windows):
     top_windows.append((hwnd, win32gui.GetWindowText(hwnd)))
@@ -133,7 +131,12 @@ def determineBAD() -> bool:
 # Determine if the screen has dimmed upon defeating either the MOAB or BAD
 def determineDim(region: Tuple[int, int], values: RGB) -> bool:
     IMAGE: Tuple[int, int, int] = getImage().getpixel(region)
-    return ((IMAGE[0] <= values.r) and (IMAGE[1] <= values.g) and (IMAGE[2] <= values.b))
+    return (IMAGE[0] <= values.r) and (IMAGE[1] <= values.g) and (IMAGE[2] <= values.b)
+
+# Determine if the user has leveled up
+def determineLevelUp() -> bool:
+    IMAGE: Tuple[int, int, int] = getImage().getpixel(LEVEL)
+    return (IMAGE[0] <= LEVELVALUES.r) and (IMAGE[1] <= LEVELVALUES.g) and (IMAGE[2] >= LEVELVALUES.b)
 
 # Print out what tower is being bought next
 def nextTower(tower: TOWER) -> None:
@@ -141,7 +144,7 @@ def nextTower(tower: TOWER) -> None:
     
 # Print out what tower is being placed at which (x, y)
 def placing(tower: TOWER) -> None:
-    print(f'Placing {tower.name} at ({tower.x}, {tower.y})')
+    print(f'Placing {tower.name} at ({tower.x}, {tower.y}).')
 
 # Print out the what upgrade is getting bought next
 def nextUpgrade(tower: TOWER, currentPath: int) -> None:
@@ -151,7 +154,7 @@ def nextUpgrade(tower: TOWER, currentPath: int) -> None:
 # Print out the current upgrade path of the given tower
 def upgrades(tower: TOWER) -> None:
     if (tower.currentUpgrades is not None):
-        print(f'Upgrading {tower.name} to {"-".join([str(i) for i in tower.currentUpgrades])}')
+        print(f'Upgrading {tower.name} to {"-".join([str(i) for i in tower.currentUpgrades])}.')
 
 # Set all towers currentUpgrades attribute back to 0
 def defaultUpgrades(towers: List[TOWER]) -> None:
@@ -164,10 +167,10 @@ def clear():
     system('cls' if name=='nt' else 'clear')
 
 # Deal with any potential level ups as they appear
-def level(region: Tuple[int, int], values: RGB, towers: List[TOWER]) -> None:
+def level(towers: List[TOWER]) -> None:
     t = currentThread()
     while getattr(t, "do_run", True):
-        if (determineDim(region, values)):
+        if (determineLevelUp()):
             
             print('Level up detected. Attempting to clear and continue program...')
             
@@ -190,8 +193,8 @@ def gameAbilities(abilities: List[str]) -> None:
             press(str(number))
 
 # Create and start the leveling up thread
-def levelThread(region: Tuple[int, int], values: RGB, towers: List[TOWER]) -> gameThread:
-    levelUp: gameThread = gameThread(level, True, (region, values, towers))
+def levelThread(towers: List[TOWER]) -> gameThread:
+    levelUp: gameThread = gameThread(level, True, towers)
     levelUp.start()
     return levelUp
 
@@ -216,7 +219,7 @@ def setCurrentMonkey(tower: TOWER, towers: List[TOWER]) -> None:
 
 # Deal with the freeplay button
 def freeplay(dimRegion: Tuple[int, int], dimValues: RGB, towers: List[TOWER]) -> None:
-    LEVELUP: gameThread = levelThread(dimRegion, dimValues, towers)
+    LEVELUP: gameThread = levelThread(towers)
     
     print('Determining if MOAB has been defeated.')
     
@@ -241,11 +244,15 @@ def freeplay(dimRegion: Tuple[int, int], dimValues: RGB, towers: List[TOWER]) ->
 
 # Restart the game
 def restart(dimRegion: Tuple[int, int], dimValues: RGB, towers: List[TOWER], insta: str) -> None:
-    if (insta == 'BAD'):        
+    if (insta == 'BAD'):
+        LEVELUP: gameThread = levelThread(towers)
+        
         print('Determining if BAD has been defeated.')
         
         while (not determineDim(dimRegion, dimValues)):
             pass
+        
+        killThread(LEVELUP)
         
         print('BAD defeated. Determining if Insta Monkey screen has appeared.')
         
