@@ -11,12 +11,12 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from main import *
 
 # CONSTS
-ADORA: TOWER = TOWER(x = 474, y = 406, location = (1754, 215), mType = 'HERO', name = 'Adora', currentMonkey = False)
-DART: TOWER = TOWER(x = 591, y = 403, location = (1888, 215), mType = 'NORMAL', name = 'Dart Monkey', currentMonkey = True, path = (0, 3, 2), currentUpgrades = [0, 0, 0])
-SUPER: TOWER = TOWER(x = 616, y = 513, location = (1751, 313), mType = 'MAGIC', name = 'Super Monkey', currentMonkey = False, path = (2, 0, 4), currentUpgrades = [0, 0, 0])
-TACK: TOWER = TOWER(x = 476, y = 495, location = (1749, 533), mType = 'NORMAL', name = 'Tack Shooter', currentMonkey = False, path = (2, 0, 5), currentUpgrades = [0, 0, 0])
-VILLAGE: TOWER = TOWER(x = 382, y = 513, location = (1745, 794), mType = 'SUPPORT', name = 'Monkey Village', currentMonkey = False, path = (3, 2, 0), currentUpgrades = [0, 0, 0])
-ALCHEMIST: TOWER = TOWER(x = 463, y = 551, location = (1745, 467), mType = 'MAGIC', name = 'Alchemist', currentMonkey = False, path = (5, 0, 2), currentUpgrades = [0, 0, 0])
+ADORA: TOWER = TOWER(x = 474, y = 406, location = (1754, 215), mType = 'HERO', name = 'Adora', currentMonkey = False, placementRegion = (397, 286), placementValues = RGB(140, 190, 40))
+DART: TOWER = TOWER(x = 591, y = 403, location = (1888, 215), mType = 'NORMAL', name = 'Dart Monkey', currentMonkey = True, placementRegion = (665, 349), placementValues = RGB(140, 190, 40), path = (0, 3, 2), currentUpgrades = [0, 0, 0])
+SUPER: TOWER = TOWER(x = 616, y = 513, location = (1751, 313), mType = 'MAGIC', name = 'Super Monkey', currentMonkey = False, placementRegion = (741, 531), placementValues = RGB(150, 195, 40), path = (2, 0, 4), currentUpgrades = [0, 0, 0])
+TACK: TOWER = TOWER(x = 476, y = 495, location = (1749, 533), mType = 'NORMAL', name = 'Tack Shooter', currentMonkey = False, placementRegion = (395, 528), placementValues = RGB(160, 205, 40), path = (2, 0, 5), currentUpgrades = [0, 0, 0])
+VILLAGE: TOWER = TOWER(x = 382, y = 513, location = (1745, 794), mType = 'SUPPORT', name = 'Monkey Village', currentMonkey = False, placementRegion = (255, 529), placementValues = RGB(150, 200, 40), path = (3, 2, 0), currentUpgrades = [0, 0, 0])
+ALCHEMIST: TOWER = TOWER(x = 463, y = 551, location = (1745, 467), mType = 'MAGIC', name = 'Alchemist', currentMonkey = False, placementRegion = (266, 537), placementValues = RGB(165, 200, 40), path = (5, 0, 2), currentUpgrades = [0, 0, 0])
 ALLTOWERS: List[TOWER] = [
     ADORA,
     DART,
@@ -39,8 +39,12 @@ def adora() -> None:
         
     setCurrentMonkey(ADORA, ALLTOWERS)
     placing(ADORA)
-    gamePress('u', 1)
-    gameClick(ADORA, 1)
+    
+    while (not determinePlacement(ADORA)):
+        gamePress('u', 1)
+        gameClick(ADORA, 2)
+        
+    gameSafeClick()
 
 # Place and upgrade the Dart Monkey
 def dart() -> None:
@@ -51,8 +55,10 @@ def dart() -> None:
     
     setCurrentMonkey(DART, ALLTOWERS)
     placing(DART)
-    gamePress('q', 1)
-    gameClick(DART, 2)
+    
+    while (not determinePlacement(DART)):
+        gamePress('q', 1)
+        gameClick(DART, 2)
     
     levelUp: gameThread = levelThread(ALLTOWERS)
     
@@ -78,11 +84,13 @@ def dart() -> None:
             gamePress('/', 1)
             
     killThread(levelUp)
+    gameSafeClick()
     
 # Place and upgrade the Super Monkey
 def superMonkey(call: int) -> None:
     if (call == 1):
         gameScroll(-1)
+        gameSafeClick()
         
         levelUp: gameThread = levelThread(ALLTOWERS)
         
@@ -95,8 +103,10 @@ def superMonkey(call: int) -> None:
         
         setCurrentMonkey(SUPER, ALLTOWERS)
         placing(SUPER)
-        gamePress('s', 1)
-        gameClick(SUPER, 2)
+        
+        while (not determinePlacement(SUPER)):
+            gamePress('s', 1)
+            gameClick(SUPER, 2)
         
         levelUp = levelThread(ALLTOWERS)
         
@@ -122,6 +132,7 @@ def superMonkey(call: int) -> None:
                 gamePress(',', 1)
                 
         killThread(levelUp)
+        gameSafeClick()
     else:
         gameClick(SUPER, 1)
         setCurrentMonkey(SUPER, ALLTOWERS)
@@ -140,6 +151,7 @@ def superMonkey(call: int) -> None:
                 gamePress('/', 1)
         
         killThread(levelUp)
+        gameSafeClick()
 
 # Place and upgrade the Tack Shooter
 def tack() -> None:
@@ -156,8 +168,10 @@ def tack() -> None:
     
     setCurrentMonkey(TACK, ALLTOWERS)
     placing(TACK)
-    gamePress('r', 1)
-    gameClick(TACK, 2)
+    
+    while (not determinePlacement(TACK)):
+        gamePress('r', 1)
+        gameClick(TACK, 2)
     
     levelUp = levelThread(ALLTOWERS)
     
@@ -183,6 +197,7 @@ def tack() -> None:
             gamePress('/', 1)
             
         killThread(levelUp)
+        gameSafeClick()
 
 # Place and upgrade the Monkey Village
 def village() -> None:
@@ -199,8 +214,10 @@ def village() -> None:
     
     setCurrentMonkey(VILLAGE, ALLTOWERS)
     placing(VILLAGE)
-    gamePress('k', 1)
-    gameClick(VILLAGE, 2)
+    
+    while (not determinePlacement(VILLAGE)):
+        gamePress('k', 1)
+        gameClick(VILLAGE, 2)
     
     levelUp = levelThread(ALLTOWERS)
     
@@ -226,6 +243,7 @@ def village() -> None:
             gamePress('.', 1)
             
         killThread(levelUp)
+        gameSafeClick()
 
 # Place and upgrade the Alchemist Monkey
 def alchemist() -> None:
@@ -242,8 +260,10 @@ def alchemist() -> None:
     
     setCurrentMonkey(ALCHEMIST, ALLTOWERS)
     placing(ALCHEMIST)
-    gamePress('f', 1)
-    gameClick(ALCHEMIST, 2)
+    
+    while (not determinePlacement(ALCHEMIST)):
+        gamePress('f', 1)
+        gameClick(ALCHEMIST, 2)
     
     levelUp = levelThread(ALLTOWERS)
     
@@ -279,6 +299,7 @@ def alchemist() -> None:
             gamePress(',', 1)
         
     killThread(levelUp)
+    gameSafeClick()
 
 # 40 rounds for non-decreased xp
 def xp() -> None:

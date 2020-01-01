@@ -17,6 +17,12 @@ from threading import Thread, currentThread
 from os import system, name
 
 @dataclass
+class RGB:
+    r: int
+    g: int
+    b: int
+
+@dataclass
 class TOWER:
     x: int
     y: int
@@ -24,21 +30,17 @@ class TOWER:
     mType: str
     name: str
     currentMonkey: bool
+    placementRegion: Tuple[int, int]
+    placementValues: RGB
     path: Optional[Tuple[int, int, int]] = None
     currentUpgrades: Optional[List[int]] = None
-    
-@dataclass
-class RGB:
-    r: int
-    g: int
-    b: int
-    
+
 class gameThread(Thread):
     def __init__(self, target, daemon: bool, args: Union[List[TOWER], List[str]]):
         Thread.__init__(self, target = target, args = [args], daemon = daemon)
         self.do_run = True
-    
-    
+
+# CONSTS
 BOX: Tuple[int, int, int, int] = (0, 0, 1920, 1080)
 TOPBOX: Tuple[int, int] = (1424, 520)
 MIDBOX: Tuple[int, int] = (1424, 700)
@@ -49,17 +51,21 @@ REGION: Dict[str, Tuple[int, int]] = {
     'low': LOWBOX
 }
 COLORS: Dict[str, RGB] = {
-    'HERO': RGB(230, 200, 0),
-    'NORMAL': RGB(130, 200, 220),
-    'MAGIC': RGB(170, 130, 230),
-    'SUPPORT': RGB(200, 180, 130),
+    'HERO': RGB(r = 230, g = 200, b = 0),
+    'NORMAL': RGB(r = 130, g = 180, b = 180),
+    'MAGIC': RGB(r = 170, g = 130, b = 170),
+    'SUPPORT': RGB(r = 200, g = 180, b = 130),
 }
 HOME: Tuple[int, int] = (803, 866)
-HOMEVALUES: RGB = RGB(20, 210, 240)
+HOMEVALUES: RGB = RGB(r = 20, g = 210, b = 240)
 BAD: Tuple[int, int] = (1212, 673)
 BADVALUES: RGB = RGB(r = 230, g = 105, b = 35)
-LEVEL: Tuple[int, int] = (170, 876)
-LEVELVALUES: RGB = RGB(180, 100, 50)
+LEVELMONKEY: Tuple[int, int] = (191, 905)
+LEVELMONKEYVALUES: RGB = RGB(r = 140, g = 100, b = 50)
+LEVELBANNER: Tuple[int, int] = (1133, 548)
+LEVELBANNERVALUES: RGB = RGB(r = 220, g = 100, b = 40)
+LEVELSTAR: Tuple[int, int] = (1025, 409)
+LEVELSTARVALUES: RGB = RGB(r = 230, g = 200, b = 20)
 
 def windowEnumerationHandler(hwnd, top_windows):
     top_windows.append((hwnd, win32gui.GetWindowText(hwnd)))
@@ -130,13 +136,23 @@ def determineBAD() -> bool:
 
 # Determine if the screen has dimmed upon defeating either the MOAB or BAD
 def determineDim(region: Tuple[int, int], values: RGB) -> bool:
+    if (determineLevelUp()):
+        return False
+    
     IMAGE: Tuple[int, int, int] = getImage().getpixel(region)
     return (IMAGE[0] <= values.r) and (IMAGE[1] <= values.g) and (IMAGE[2] <= values.b)
 
 # Determine if the user has leveled up
 def determineLevelUp() -> bool:
-    IMAGE: Tuple[int, int, int] = getImage().getpixel(LEVEL)
-    return (IMAGE[0] <= LEVELVALUES.r) and (IMAGE[1] <= LEVELVALUES.g) and (IMAGE[2] >= LEVELVALUES.b)
+    LEVELIMAGE: Tuple[int, int, int] = getImage().getpixel(LEVELMONKEY)    
+    BANNERIMAGE: Tuple[int, int, int] = getImage().getpixel(LEVELBANNER)    
+    STARIMAGE: Tuple[int, int, int] = getImage().getpixel(LEVELSTAR)    
+    return (((LEVELIMAGE[0] >= LEVELMONKEYVALUES.r) and (LEVELIMAGE[1] <= LEVELMONKEYVALUES.g) and (LEVELIMAGE[2] <= LEVELMONKEYVALUES.b)) and ((BANNERIMAGE[0] >= LEVELBANNERVALUES.r) and (BANNERIMAGE[1] <= LEVELBANNERVALUES.g) and (BANNERIMAGE[2] <= LEVELBANNERVALUES.b)) and ((STARIMAGE[0] >= LEVELSTARVALUES.r) and (STARIMAGE[1] >= LEVELSTARVALUES.g) and (STARIMAGE[2] <= LEVELSTARVALUES.b)))
+
+# Determine if the tower was placed
+def determinePlacement(tower: TOWER) -> bool:
+    IMAGE: Tuple[int, int, int] = getImage().getpixel(tower.placementRegion)
+    return ((IMAGE[0] <= tower.placementValues.r) and (IMAGE[1] <= tower.placementValues.g) and (IMAGE[2] >= tower.placementValues.b))
 
 # Print out what tower is being bought next
 def nextTower(tower: TOWER) -> None:
@@ -171,7 +187,6 @@ def level(towers: List[TOWER]) -> None:
     t = currentThread()
     while getattr(t, "do_run", True):
         if (determineLevelUp()):
-            
             print('Level up detected. Attempting to clear and continue program...')
             
             for tower in towers:
