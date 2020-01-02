@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Author   : Matthew Moore
-Revision : 2019-12-30
+Revision : 2020-01-02
 Date     : 2019-12-28
 """
 
@@ -30,8 +30,6 @@ class TOWER:
     mType: str
     name: str
     currentMonkey: bool
-    placementRegion: Tuple[int, int]
-    placementValues: RGB
     path: Optional[Tuple[int, int, int]] = None
     currentUpgrades: Optional[List[int]] = None
 
@@ -64,8 +62,10 @@ LEVELMONKEY: Tuple[int, int] = (191, 905)
 LEVELMONKEYVALUES: RGB = RGB(r = 140, g = 100, b = 50)
 LEVELBANNER: Tuple[int, int] = (1133, 548)
 LEVELBANNERVALUES: RGB = RGB(r = 220, g = 100, b = 40)
-LEVELSTAR: Tuple[int, int] = (1025, 409)
+LEVELSTAR: Tuple[int, int] = (958, 381)
 LEVELSTARVALUES: RGB = RGB(r = 230, g = 200, b = 20)
+PLACEMENT: Tuple[int, int] = (1207, 56)
+PLACEMENTVALUES: RGB = RGB(r = 180, g = 170, b = 110)
 
 def windowEnumerationHandler(hwnd, top_windows):
     top_windows.append((hwnd, win32gui.GetWindowText(hwnd)))
@@ -146,13 +146,13 @@ def determineDim(region: Tuple[int, int], values: RGB) -> bool:
 def determineLevelUp() -> bool:
     LEVELIMAGE: Tuple[int, int, int] = getImage().getpixel(LEVELMONKEY)    
     BANNERIMAGE: Tuple[int, int, int] = getImage().getpixel(LEVELBANNER)    
-    STARIMAGE: Tuple[int, int, int] = getImage().getpixel(LEVELSTAR)    
+    STARIMAGE: Tuple[int, int, int] = getImage().getpixel(LEVELSTAR)
     return (((LEVELIMAGE[0] >= LEVELMONKEYVALUES.r) and (LEVELIMAGE[1] <= LEVELMONKEYVALUES.g) and (LEVELIMAGE[2] <= LEVELMONKEYVALUES.b)) and ((BANNERIMAGE[0] >= LEVELBANNERVALUES.r) and (BANNERIMAGE[1] <= LEVELBANNERVALUES.g) and (BANNERIMAGE[2] <= LEVELBANNERVALUES.b)) and ((STARIMAGE[0] >= LEVELSTARVALUES.r) and (STARIMAGE[1] >= LEVELSTARVALUES.g) and (STARIMAGE[2] <= LEVELSTARVALUES.b)))
 
 # Determine if the tower was placed
-def determinePlacement(tower: TOWER) -> bool:
-    IMAGE: Tuple[int, int, int] = getImage().getpixel(tower.placementRegion)
-    return ((IMAGE[0] <= tower.placementValues.r) and (IMAGE[1] <= tower.placementValues.g) and (IMAGE[2] >= tower.placementValues.b))
+def determinePlacement() -> bool:
+    IMAGE: Tuple[int, int, int] = getImage().getpixel(PLACEMENT)
+    return ((IMAGE[0] >= PLACEMENTVALUES.r) and (IMAGE[1] <= PLACEMENTVALUES.g) and (IMAGE[2] <= PLACEMENTVALUES.b))
 
 # Print out what tower is being bought next
 def nextTower(tower: TOWER) -> None:

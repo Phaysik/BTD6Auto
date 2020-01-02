@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Author   : Matthew Moore
-Revision : 2019-12-30
+Revision : 2020-01-02
 Date     : 2019-12-29
 """
 
@@ -11,12 +11,12 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from main import *
 
 # CONSTS
-ADORA: TOWER = TOWER(x = 474, y = 406, location = (1754, 215), mType = 'HERO', name = 'Adora', currentMonkey = False, placementRegion = (397, 286), placementValues = RGB(140, 190, 40))
-DART: TOWER = TOWER(x = 591, y = 403, location = (1888, 215), mType = 'NORMAL', name = 'Dart Monkey', currentMonkey = True, placementRegion = (665, 349), placementValues = RGB(140, 190, 40), path = (0, 3, 2), currentUpgrades = [0, 0, 0])
-SUPER: TOWER = TOWER(x = 616, y = 513, location = (1751, 313), mType = 'MAGIC', name = 'Super Monkey', currentMonkey = False, placementRegion = (741, 531), placementValues = RGB(150, 195, 40), path = (2, 0, 4), currentUpgrades = [0, 0, 0])
-TACK: TOWER = TOWER(x = 476, y = 495, location = (1749, 533), mType = 'NORMAL', name = 'Tack Shooter', currentMonkey = False, placementRegion = (395, 528), placementValues = RGB(160, 205, 40), path = (2, 0, 5), currentUpgrades = [0, 0, 0])
-VILLAGE: TOWER = TOWER(x = 382, y = 513, location = (1745, 794), mType = 'SUPPORT', name = 'Monkey Village', currentMonkey = False, placementRegion = (255, 529), placementValues = RGB(150, 200, 40), path = (3, 2, 0), currentUpgrades = [0, 0, 0])
-ALCHEMIST: TOWER = TOWER(x = 463, y = 551, location = (1745, 467), mType = 'MAGIC', name = 'Alchemist', currentMonkey = False, placementRegion = (266, 537), placementValues = RGB(165, 200, 40), path = (5, 0, 2), currentUpgrades = [0, 0, 0])
+ADORA: TOWER = TOWER(x = 474, y = 406, location = (1754, 215), mType = 'HERO', name = 'Adora', currentMonkey = False)
+DART: TOWER = TOWER(x = 591, y = 403, location = (1888, 215), mType = 'NORMAL', name = 'Dart Monkey', currentMonkey = True, path = (0, 3, 2), currentUpgrades = [0, 0, 0])
+SUPER: TOWER = TOWER(x = 616, y = 513, location = (1751, 313), mType = 'MAGIC', name = 'Super Monkey', currentMonkey = False, path = (2, 0, 4), currentUpgrades = [0, 0, 0])
+TACK: TOWER = TOWER(x = 476, y = 495, location = (1749, 533), mType = 'NORMAL', name = 'Tack Shooter', currentMonkey = False, path = (2, 0, 5), currentUpgrades = [0, 0, 0])
+VILLAGE: TOWER = TOWER(x = 382, y = 513, location = (1745, 794), mType = 'SUPPORT', name = 'Monkey Village', currentMonkey = False, path = (3, 2, 0), currentUpgrades = [0, 0, 0])
+ALCHEMIST: TOWER = TOWER(x = 463, y = 551, location = (1745, 467), mType = 'MAGIC', name = 'Alchemist', currentMonkey = False, path = (5, 0, 2), currentUpgrades = [0, 0, 0])
 ALLTOWERS: List[TOWER] = [
     ADORA,
     DART,
@@ -40,7 +40,7 @@ def adora() -> None:
     setCurrentMonkey(ADORA, ALLTOWERS)
     placing(ADORA)
     
-    while (not determinePlacement(ADORA)):
+    while (not determinePlacement()):
         gamePress('u', 1)
         gameClick(ADORA, 2)
         
@@ -56,7 +56,7 @@ def dart() -> None:
     setCurrentMonkey(DART, ALLTOWERS)
     placing(DART)
     
-    while (not determinePlacement(DART)):
+    while (not determinePlacement()):
         gamePress('q', 1)
         gameClick(DART, 2)
     
@@ -104,7 +104,7 @@ def superMonkey(call: int) -> None:
         setCurrentMonkey(SUPER, ALLTOWERS)
         placing(SUPER)
         
-        while (not determinePlacement(SUPER)):
+        while (not determinePlacement()):
             gamePress('s', 1)
             gameClick(SUPER, 2)
         
@@ -169,7 +169,7 @@ def tack() -> None:
     setCurrentMonkey(TACK, ALLTOWERS)
     placing(TACK)
     
-    while (not determinePlacement(TACK)):
+    while (not determinePlacement()):
         gamePress('r', 1)
         gameClick(TACK, 2)
     
@@ -215,7 +215,7 @@ def village() -> None:
     setCurrentMonkey(VILLAGE, ALLTOWERS)
     placing(VILLAGE)
     
-    while (not determinePlacement(VILLAGE)):
+    while (not determinePlacement()):
         gamePress('k', 1)
         gameClick(VILLAGE, 2)
     
@@ -261,7 +261,7 @@ def alchemist() -> None:
     setCurrentMonkey(ALCHEMIST, ALLTOWERS)
     placing(ALCHEMIST)
     
-    while (not determinePlacement(ALCHEMIST)):
+    while (not determinePlacement()):
         gamePress('f', 1)
         gameClick(ALCHEMIST, 2)
     
