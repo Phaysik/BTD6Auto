@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Author   : Matthew Moore
-Revision : 2020-01-02
+Revision : 2020-01-06
 Date     : 2019-12-29
 """
 
@@ -11,12 +11,12 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from main import *
 
 # CONSTS
-ADORA: TOWER = TOWER(x = 474, y = 406, location = (1754, 215), mType = 'HERO', name = 'Adora', currentMonkey = False)
-DART: TOWER = TOWER(x = 591, y = 403, location = (1888, 215), mType = 'NORMAL', name = 'Dart Monkey', currentMonkey = True, path = (0, 3, 2), currentUpgrades = [0, 0, 0])
-SUPER: TOWER = TOWER(x = 616, y = 513, location = (1751, 313), mType = 'MAGIC', name = 'Super Monkey', currentMonkey = False, path = (2, 0, 4), currentUpgrades = [0, 0, 0])
-TACK: TOWER = TOWER(x = 476, y = 495, location = (1749, 533), mType = 'NORMAL', name = 'Tack Shooter', currentMonkey = False, path = (2, 0, 5), currentUpgrades = [0, 0, 0])
-VILLAGE: TOWER = TOWER(x = 382, y = 513, location = (1745, 794), mType = 'SUPPORT', name = 'Monkey Village', currentMonkey = False, path = (3, 2, 0), currentUpgrades = [0, 0, 0])
-ALCHEMIST: TOWER = TOWER(x = 463, y = 551, location = (1745, 467), mType = 'MAGIC', name = 'Alchemist', currentMonkey = False, path = (5, 0, 2), currentUpgrades = [0, 0, 0])
+ADORA: TOWER = TOWER(x = 474, y = 406, location = (1754, 215), mType = 'HERO', name = 'Adora', currentMonkey = False, key = 'u')
+DART: TOWER = TOWER(x = 591, y = 403, location = (1888, 215), mType = 'NORMAL', name = 'Dart Monkey', currentMonkey = True, key = 'q', path = [{1: 3, 2: 2}], currentUpgrades = [0, 0, 0])
+SUPER: TOWER = TOWER(x = 616, y = 513, location = (1751, 313), mType = 'MAGIC', name = 'Super Monkey', currentMonkey = False, key = 's', path = [{2: 2, 0: 2}, {2: 2}], currentUpgrades = [0, 0, 0])
+TACK: TOWER = TOWER(x = 476, y = 495, location = (1749, 533), mType = 'NORMAL', name = 'Tack Shooter', currentMonkey = False, key = 'r', path = [{0: 2, 2: 5}], currentUpgrades = [0, 0, 0])
+VILLAGE: TOWER = TOWER(x = 382, y = 513, location = (1745, 794), mType = 'SUPPORT', name = 'Monkey Village', currentMonkey = False, key = 'k', path = [{0: 3, 1: 2}], currentUpgrades = [0, 0, 0])
+ALCHEMIST: TOWER = TOWER(x = 463, y = 551, location = (1745, 467), mType = 'MAGIC', name = 'Alchemist', currentMonkey = False, key = 'f', path = [{0: 4, 2: 2}, {0: 1}], currentUpgrades = [0, 0, 0])
 ALLTOWERS: List[TOWER] = [
     ADORA,
     DART,
@@ -25,220 +25,9 @@ ALLTOWERS: List[TOWER] = [
     VILLAGE,
     ALCHEMIST
 ]
-
 DIM: Tuple[int, int] = (511, 1062)
 DIMVALUES: RGB = RGB(r = 51, g = 67, b = 30)
 ABILITIES: List[str] = ['1', '3']
-
-# Place down Adora
-def adora() -> None:
-    nextTower(ADORA)
-    
-    while (not determinePlacement()):
-        gamePress('u', 1)
-        gameClick(ADORA, 2)
-        
-    setCurrentMonkey(ADORA, ALLTOWERS)
-    placing(ADORA)
-        
-    gameSafeClick()
-
-# Place and upgrade the Dart Monkey
-def dart() -> None:    
-    nextTower(DART)
-    
-    while (not determinePlacement()):
-        gamePress('q', 1)
-        gameClick(DART, 2)
-        
-    setCurrentMonkey(DART, ALLTOWERS)
-    placing(DART)
-    
-    if (DART.path is not None and DART.currentUpgrades is not None):
-        for i in range(DART.path[1]):
-            nextUpgrade(DART, 1)
-            
-            while (not determineMove('mid')):
-                pass
-            
-            DART.currentUpgrades[1] += 1
-            upgrades(DART)
-            gamePress('.', 1)
-            
-        for i in range(DART.path[2]):
-            nextUpgrade(DART, 2)
-            
-            while (not determineMove('low')):
-                pass
-            
-            DART.currentUpgrades[2] += 1
-            upgrades(DART)
-            gamePress('/', 1)
-            
-    gameSafeClick()
-    
-# Place and upgrade the Super Monkey
-def superMonkey(call: int) -> None:
-    if (call == 1):        
-        nextTower(SUPER)
-        
-        while (not determinePlacement()):
-            gamePress('s', 1)
-            gameClick(SUPER, 2)
-        
-        setCurrentMonkey(SUPER, ALLTOWERS)
-        placing(SUPER)
-        
-        if (SUPER.path is not None and SUPER.currentUpgrades is not None):
-            for i in range(SUPER.path[2] - 2):
-                nextUpgrade(SUPER, 2)
-                
-                while (not determineMove('low')):
-                    pass
-                
-                SUPER.currentUpgrades[2] += 1
-                upgrades(SUPER)
-                gamePress('/', 1)
-            
-            for i in range(SUPER.path[0]):
-                nextUpgrade(SUPER, 0)
-                
-                while (not determineMove('top')):
-                    pass
-            
-                SUPER.currentUpgrades[0] += 1
-                upgrades(SUPER)
-                gamePress(',', 1)
-                
-        gameSafeClick()
-    else:
-        gameClick(SUPER, 1)
-        setCurrentMonkey(SUPER, ALLTOWERS)
-        
-        if (SUPER.path is not None and SUPER.currentUpgrades is not None):
-            for i in range(SUPER.path[2] - 2):
-                nextUpgrade(SUPER, 2)
-                
-                while (not determineMove('low')):
-                    pass
-                
-                SUPER.currentUpgrades[2] += 1
-                upgrades(SUPER)
-                gamePress('/', 1)
-        
-        gameSafeClick()
-
-# Place and upgrade the Tack Shooter
-def tack() -> None:
-    nextTower(TACK)
-        
-    while (not determinePlacement()):
-        gamePress('r', 1)
-        gameClick(TACK, 2)
-        
-    setCurrentMonkey(TACK, ALLTOWERS)
-    placing(TACK)
-        
-    if (TACK.path is not None and TACK.currentUpgrades is not None):
-        for i in range(TACK.path[0]):
-            nextUpgrade(TACK, 0)
-            
-            while (not determineMove('top')):
-                pass
-            
-            TACK.currentUpgrades[0] += 1
-            upgrades(TACK)
-            gamePress(',', 1)
-        
-        for i in range(TACK.path[2]):
-            nextUpgrade(TACK, 2)
-            
-            while (not determineMove('low')):
-                pass
-            
-            TACK.currentUpgrades[2] += 1
-            upgrades(TACK)
-            gamePress('/', 1)
-            
-        gameSafeClick()
-
-# Place and upgrade the Monkey Village
-def village() -> None:  
-    nextTower(VILLAGE)
-    
-    while (not determinePlacement()):
-        gamePress('k', 1)
-        gameClick(VILLAGE, 2)
-    
-    setCurrentMonkey(VILLAGE, ALLTOWERS)
-    placing(VILLAGE)
-    
-    if (VILLAGE.path is not None and VILLAGE.currentUpgrades is not None):
-        for i in range(VILLAGE.path[0]):
-            nextUpgrade(VILLAGE, 0)
-            
-            while (not determineMove('top')):
-                pass
-            
-            VILLAGE.currentUpgrades[0] += 1
-            upgrades(VILLAGE)
-            gamePress(',', 1)
-        
-        for i in range(VILLAGE.path[1]):
-            nextUpgrade(VILLAGE, 1)
-            
-            while (not determineMove('mid')):
-                pass
-        
-            VILLAGE.currentUpgrades[1] += 1
-            upgrades(VILLAGE)
-            gamePress('.', 1)
-            
-        gameSafeClick()
-
-# Place and upgrade the Alchemist Monkey
-def alchemist() -> None:
-    nextTower(ALCHEMIST)
-    
-    while (not determinePlacement()):
-        gamePress('f', 1)
-        gameClick(ALCHEMIST, 2)
-    
-    setCurrentMonkey(ALCHEMIST, ALLTOWERS)
-    placing(ALCHEMIST)
-    
-    if (ALCHEMIST.path is not None and ALCHEMIST.currentUpgrades is not None):
-        for i in range(ALCHEMIST.path[0] - 1):
-            nextUpgrade(ALCHEMIST, 0)
-            
-            while (not determineMove('top')):
-                pass
-            
-            ALCHEMIST.currentUpgrades[0] += 1
-            upgrades(ALCHEMIST)
-            gamePress(',', 1)
-        
-        for i in range(ALCHEMIST.path[2]):
-            nextUpgrade(ALCHEMIST, 2)
-            
-            while (not determineMove('low')):
-                pass
-            
-            ALCHEMIST.currentUpgrades[2] += 1
-            upgrades(ALCHEMIST)
-            gamePress('/', 1)
-            
-        for i in range(ALCHEMIST.path[0] - 4):
-            nextUpgrade(ALCHEMIST, 0)
-            
-            while (not determineMove('top')):
-                pass
-            
-            ALCHEMIST.currentUpgrades[0] += 1
-            upgrades(ALCHEMIST)
-            gamePress(',', 1)
-        
-    gameSafeClick()
 
 # 40 rounds for non-decreased xp
 def xp() -> None:
@@ -247,6 +36,7 @@ def xp() -> None:
     
     while (True):
         levelUp: gameThread = levelThread(ALLTOWERS)
+        
         clear()
         
         print('Starting Monkey Meadow - Easy (Round 40 restart)')
@@ -257,12 +47,14 @@ def xp() -> None:
         moveTo(1733, 337)
         sleep(1)
         gamePress('space', 2)
-        adora()
+        
+        gamePlaceTower(0, ADORA, ALLTOWERS)
         
         ability = abilityThread(ABILITIES)
         
-        dart()        
-        superMonkey(1)
+        gamePlaceTower(0, DART, ALLTOWERS)     
+        gamePlaceTower(0, SUPER, ALLTOWERS)     
+        
         freeplay(DIM, DIMVALUES, ALLTOWERS)
         restart(DIM, DIMVALUES, ALLTOWERS, 'RESTART')
         
@@ -279,6 +71,7 @@ def insta() -> None:
 
     while (True):
         levelUp: gameThread = levelThread(ALLTOWERS)
+        
         clear()
         
         print('Starting Monkey Meadow - Easy (Round 100 restart)')
@@ -288,18 +81,23 @@ def insta() -> None:
         moveTo(1733, 337)
         sleep(1)
         gamePress('space', 2)
-        adora()
+        
+        gamePlaceTower(0, ADORA, ALLTOWERS)
         
         ability = abilityThread(ABILITIES)
         
-        dart()
-        superMonkey(1)
+        gamePlaceTower(0, DART, ALLTOWERS)
+        gamePlaceTower(0, SUPER, ALLTOWERS)
+        
         freeplay(DIM, DIMVALUES, ALLTOWERS)
         gamePress('space', 1)
-        tack()
-        village()
-        alchemist()
-        superMonkey(2)
+        
+        gamePlaceTower(0, TACK, ALLTOWERS)
+        gamePlaceTower(0, VILLAGE, ALLTOWERS)
+        gamePlaceTower(0, ALCHEMIST, ALLTOWERS)
+        gamePlaceTower(1, ALCHEMIST, ALLTOWERS)
+        gamePlaceTower(1, SUPER, ALLTOWERS)
+        
         restart(DIM, DIMVALUES, ALLTOWERS, 'BAD')
         
         killThread(ability)

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Author   : Matthew Moore
-Revision : 2020-01-02
+Revision : 2020-01-06
 Date     : 2019-12-28
 """
 
@@ -30,7 +30,8 @@ class TOWER:
     mType: str
     name: str
     currentMonkey: bool
-    path: Optional[Tuple[int, int, int]] = None
+    key: str
+    path: Optional[List[Dict[int, int]]] = None
     currentUpgrades: Optional[List[int]] = None
 
 class gameThread(Thread):
@@ -53,6 +54,16 @@ COLORS: Dict[str, RGB] = {
     'NORMAL': RGB(r = 130, g = 180, b = 180),
     'MAGIC': RGB(r = 170, g = 130, b = 170),
     'SUPPORT': RGB(r = 200, g = 180, b = 130),
+}
+MOVES: Dict[int, str] = {
+    0: ',',
+    1: '.',
+    2: '/'
+}
+MOVESREGION: Dict[int, str] = {
+    0: 'top',
+    1: 'mid',
+    2: 'low'
 }
 HOME: Tuple[int, int] = (803, 866)
 HOMEVALUES: RGB = RGB(r = 20, g = 210, b = 240)
@@ -87,7 +98,36 @@ def gamePress(key: str, times: int) -> None:
 def gameSafeClick() -> None:
     moveTo(100, 100)
     click(100, 100)
+
+# Place and upgrade tower
+def gamePlaceTower(index: int, tower: TOWER, allTowers: List[TOWER]) -> None:
+    if (index == 0):
+        nextTower(tower)
+
+        while (not determinePlacement()):
+            gamePress(tower.key, 1)
+            gameClick(tower, 2)
+
+        placing(tower)
+    else:
+        gameClick(tower, 1)
     
+    setCurrentMonkey(tower, allTowers)
+    
+    if (tower.path is not None and tower.currentUpgrades is not None):
+        for key, value in tower.path[index].items():
+            for i in range(value):
+                nextUpgrade(tower, key)
+                
+                while (not determineMove(MOVESREGION[key])):
+                    pass
+                
+                tower.currentUpgrades[key] += 1
+                upgrades(tower)
+                gamePress(MOVES[key], 1)
+            
+    gameSafeClick()
+
 # Set active window
 def activeWindow() -> None:
     results: List[str] = []
