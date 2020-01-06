@@ -33,34 +33,26 @@ ABILITIES: List[str] = ['1', '3']
 # Place down Adora
 def adora() -> None:
     nextTower(ADORA)
-        
-    while (not determineMonkey(ADORA)):
-        pass
-        
-    setCurrentMonkey(ADORA, ALLTOWERS)
-    placing(ADORA)
     
     while (not determinePlacement()):
         gamePress('u', 1)
         gameClick(ADORA, 2)
         
+    setCurrentMonkey(ADORA, ALLTOWERS)
+    placing(ADORA)
+        
     gameSafeClick()
 
 # Place and upgrade the Dart Monkey
-def dart() -> None:
+def dart() -> None:    
     nextTower(DART)
-    
-    while (not determineMonkey(DART)):
-        pass
-    
-    setCurrentMonkey(DART, ALLTOWERS)
-    placing(DART)
     
     while (not determinePlacement()):
         gamePress('q', 1)
         gameClick(DART, 2)
-    
-    levelUp: gameThread = levelThread(ALLTOWERS)
+        
+    setCurrentMonkey(DART, ALLTOWERS)
+    placing(DART)
     
     if (DART.path is not None and DART.currentUpgrades is not None):
         for i in range(DART.path[1]):
@@ -83,32 +75,19 @@ def dart() -> None:
             upgrades(DART)
             gamePress('/', 1)
             
-    killThread(levelUp)
     gameSafeClick()
     
 # Place and upgrade the Super Monkey
 def superMonkey(call: int) -> None:
-    if (call == 1):
-        gameScroll(-1)
-        gameSafeClick()
-        
-        levelUp: gameThread = levelThread(ALLTOWERS)
-        
+    if (call == 1):        
         nextTower(SUPER)
-        
-        while (not determineMonkey(SUPER)):
-            pass
-        
-        killThread(levelUp)
-        
-        setCurrentMonkey(SUPER, ALLTOWERS)
-        placing(SUPER)
         
         while (not determinePlacement()):
             gamePress('s', 1)
             gameClick(SUPER, 2)
         
-        levelUp = levelThread(ALLTOWERS)
+        setCurrentMonkey(SUPER, ALLTOWERS)
+        placing(SUPER)
         
         if (SUPER.path is not None and SUPER.currentUpgrades is not None):
             for i in range(SUPER.path[2] - 2):
@@ -131,13 +110,10 @@ def superMonkey(call: int) -> None:
                 upgrades(SUPER)
                 gamePress(',', 1)
                 
-        killThread(levelUp)
         gameSafeClick()
     else:
         gameClick(SUPER, 1)
         setCurrentMonkey(SUPER, ALLTOWERS)
-        
-        levelUp = levelThread(ALLTOWERS)
         
         if (SUPER.path is not None and SUPER.currentUpgrades is not None):
             for i in range(SUPER.path[2] - 2):
@@ -150,31 +126,19 @@ def superMonkey(call: int) -> None:
                 upgrades(SUPER)
                 gamePress('/', 1)
         
-        killThread(levelUp)
         gameSafeClick()
 
 # Place and upgrade the Tack Shooter
 def tack() -> None:
-    gameScroll(1)
-    
-    levelUp: gameThread = levelThread(ALLTOWERS)
-    
     nextTower(TACK)
-    
-    while (not determineMonkey(TACK)):
-        pass
-    
-    killThread(levelUp)
-    
-    setCurrentMonkey(TACK, ALLTOWERS)
-    placing(TACK)
-    
+        
     while (not determinePlacement()):
         gamePress('r', 1)
         gameClick(TACK, 2)
-    
-    levelUp = levelThread(ALLTOWERS)
-    
+        
+    setCurrentMonkey(TACK, ALLTOWERS)
+    placing(TACK)
+        
     if (TACK.path is not None and TACK.currentUpgrades is not None):
         for i in range(TACK.path[0]):
             nextUpgrade(TACK, 0)
@@ -196,30 +160,18 @@ def tack() -> None:
             upgrades(TACK)
             gamePress('/', 1)
             
-        killThread(levelUp)
         gameSafeClick()
 
 # Place and upgrade the Monkey Village
-def village() -> None:
-    gameScroll(-1)
-    
-    levelUp: gameThread = levelThread(ALLTOWERS)
-    
+def village() -> None:  
     nextTower(VILLAGE)
-    
-    while (not determineMonkey(VILLAGE)):
-        pass
-    
-    killThread(levelUp)
-    
-    setCurrentMonkey(VILLAGE, ALLTOWERS)
-    placing(VILLAGE)
     
     while (not determinePlacement()):
         gamePress('k', 1)
         gameClick(VILLAGE, 2)
     
-    levelUp = levelThread(ALLTOWERS)
+    setCurrentMonkey(VILLAGE, ALLTOWERS)
+    placing(VILLAGE)
     
     if (VILLAGE.path is not None and VILLAGE.currentUpgrades is not None):
         for i in range(VILLAGE.path[0]):
@@ -242,30 +194,18 @@ def village() -> None:
             upgrades(VILLAGE)
             gamePress('.', 1)
             
-        killThread(levelUp)
         gameSafeClick()
 
 # Place and upgrade the Alchemist Monkey
 def alchemist() -> None:
-    gameScroll(-1)
-    
-    levelUp: gameThread = levelThread(ALLTOWERS)
-    
     nextTower(ALCHEMIST)
-    
-    while (not determineMonkey(ALCHEMIST)):
-        pass
-    
-    killThread(levelUp)
-    
-    setCurrentMonkey(ALCHEMIST, ALLTOWERS)
-    placing(ALCHEMIST)
     
     while (not determinePlacement()):
         gamePress('f', 1)
         gameClick(ALCHEMIST, 2)
     
-    levelUp = levelThread(ALLTOWERS)
+    setCurrentMonkey(ALCHEMIST, ALLTOWERS)
+    placing(ALCHEMIST)
     
     if (ALCHEMIST.path is not None and ALCHEMIST.currentUpgrades is not None):
         for i in range(ALCHEMIST.path[0] - 1):
@@ -298,7 +238,6 @@ def alchemist() -> None:
             upgrades(ALCHEMIST)
             gamePress(',', 1)
         
-    killThread(levelUp)
     gameSafeClick()
 
 # 40 rounds for non-decreased xp
@@ -307,6 +246,7 @@ def xp() -> None:
     iteration: int = 1
     
     while (True):
+        levelUp: gameThread = levelThread(ALLTOWERS)
         clear()
         
         print('Starting Monkey Meadow - Easy (Round 40 restart)')
@@ -316,7 +256,6 @@ def xp() -> None:
         
         moveTo(1733, 337)
         sleep(1)
-        gameScroll(1)
         gamePress('space', 2)
         adora()
         
@@ -328,6 +267,7 @@ def xp() -> None:
         restart(DIM, DIMVALUES, ALLTOWERS, 'RESTART')
         
         killThread(ability)
+        killThread(levelUp)
         
         sleep(3)
         iteration += 1
@@ -338,6 +278,7 @@ def insta() -> None:
     iteration: int = 1
 
     while (True):
+        levelUp: gameThread = levelThread(ALLTOWERS)
         clear()
         
         print('Starting Monkey Meadow - Easy (Round 100 restart)')
@@ -346,7 +287,6 @@ def insta() -> None:
         activeWindow()
         moveTo(1733, 337)
         sleep(1)
-        gameScroll(1)
         gamePress('space', 2)
         adora()
         
@@ -363,6 +303,7 @@ def insta() -> None:
         restart(DIM, DIMVALUES, ALLTOWERS, 'BAD')
         
         killThread(ability)
+        killThread(levelUp)
         
         sleep(3)
         iteration += 1

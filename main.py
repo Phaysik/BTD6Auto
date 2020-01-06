@@ -82,17 +82,7 @@ def gamePress(key: str, times: int) -> None:
     for i in range(times):
         sleep(.2)
         press(key)
-
-# Scroll the Monkey Window
-def gameScroll(value: int) -> None:    
-    moveTo(1733, 337)
-    sleep(.5)
-    
-    for i in range(20):
-        scroll(value)
         
-    sleep(.5)
-
 # Click on an empty and safe area of the screen
 def gameSafeClick() -> None:
     moveTo(100, 100)
@@ -118,11 +108,6 @@ def getImage() -> Image:
 def determineMove(region: str) -> bool:
     IMAGE: Tuple[int, int, int] = getImage().getpixel(REGION[region])
     return ((IMAGE[0] >= 60) and (IMAGE[1] >= 200) and (IMAGE[2] <= 20))
-
-# Determine if a monkey is available for purchase
-def determineMonkey(monkey: TOWER) -> bool:
-    IMAGE: Tuple[int, int, int] = getImage().getpixel(monkey.location)
-    return ((IMAGE[0] >= COLORS[monkey.mType].r) and (IMAGE[1] >= COLORS[monkey.mType].g) and (IMAGE[2] >= COLORS[monkey.mType].b))
 
 # Determine if the home button is on screen
 def determineHome() -> bool:
