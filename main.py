@@ -26,13 +26,11 @@ class RGB:
 class TOWER:
     x: int
     y: int
-    location: Tuple[int, int]
-    mType: str
     name: str
-    currentMonkey: bool
+    currMonkey: bool
     key: str
     path: Optional[List[Dict[int, int]]] = None
-    currentUpgrades: Optional[List[int]] = None
+    currUpgrades: Optional[List[int]] = None
 
 class gameThread(Thread):
     def __init__(self, target, daemon: bool, args: Union[List[TOWER], List[str]]):
@@ -114,7 +112,7 @@ def gamePlaceTower(index: int, tower: TOWER, allTowers: List[TOWER]) -> None:
     
     setCurrentMonkey(tower, allTowers)
     
-    if (tower.path is not None and tower.currentUpgrades is not None):
+    if (tower.path is not None and tower.currUpgrades is not None):
         for key, value in tower.path[index].items():
             for i in range(value):
                 nextUpgrade(tower, key)
@@ -122,7 +120,7 @@ def gamePlaceTower(index: int, tower: TOWER, allTowers: List[TOWER]) -> None:
                 while (not determineMove(MOVESREGION[key])):
                     pass
                 
-                tower.currentUpgrades[key] += 1
+                tower.currUpgrades[key] += 1
                 upgrades(tower)
                 gamePress(MOVES[key], 1)
             
@@ -189,19 +187,19 @@ def placing(tower: TOWER) -> None:
 
 # Print out the what upgrade is getting bought next
 def nextUpgrade(tower: TOWER, currentPath: int) -> None:
-    if (tower.currentUpgrades is not None):
-        print(f'Waiting on {tower.name} {"-".join([str(tower.currentUpgrades[i] + 1) if (currentPath == i) else (str(tower.currentUpgrades[i])) for i in range(len(tower.currentUpgrades))])}.')
+    if (tower.currUpgrades is not None):
+        print(f'Waiting on {tower.name} {"-".join([str(tower.currUpgrades[i] + 1) if (currentPath == i) else (str(tower.currUpgrades[i])) for i in range(len(tower.currUpgrades))])}.')
         
 # Print out the current upgrade path of the given tower
 def upgrades(tower: TOWER) -> None:
-    if (tower.currentUpgrades is not None):
-        print(f'Upgrading {tower.name} to {"-".join([str(i) for i in tower.currentUpgrades])}.')
+    if (tower.currUpgrades is not None):
+        print(f'Upgrading {tower.name} to {"-".join([str(i) for i in tower.currUpgrades])}.')
 
-# Set all towers currentUpgrades attribute back to 0
+# Set all towers currUpgrades attribute back to 0
 def defaultUpgrades(towers: List[TOWER]) -> None:
     for monkey in towers:
-        if (monkey.currentUpgrades is not None):
-            monkey.currentUpgrades = [0, 0, 0]
+        if (monkey.currUpgrades is not None):
+            monkey.currUpgrades = [0, 0, 0]
 
 # Clear the console
 def clear():
@@ -215,7 +213,7 @@ def level(towers: List[TOWER]) -> None:
             print('Level up detected. Attempting to clear and continue program...')
             
             for tower in towers:
-                if (tower.currentMonkey):
+                if (tower.currMonkey):
                     for i in range(2):
                         sleep(.2)
                         moveTo(1470, 298)
@@ -253,9 +251,9 @@ def killThread(thread: gameThread) -> None:
 def setCurrentMonkey(tower: TOWER, towers: List[TOWER]) -> None:
     for monkey in towers:
         if (tower == monkey):
-            monkey.currentMonkey = True
+            monkey.currMonkey = True
         else:
-            monkey.currentMonkey = False
+            monkey.currMonkey = False
 
 # Deal with the freeplay button
 def freeplay(dimRegion: Tuple[int, int], dimValues: RGB, towers: List[TOWER]) -> None:

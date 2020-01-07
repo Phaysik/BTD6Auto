@@ -1,0 +1,17 @@
+{
+    "maps": [{
+            "name": "Monkey Meadow",
+            "easy": [
+                "Standard"
+            ],
+            "medium": [],
+            "hard": []
+        },
+        {
+            "name": "Park Path",
+            "easy": [],
+            "medium": [],
+            "hard": []
+        }
+    ]
+}
