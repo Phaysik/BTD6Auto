@@ -39,9 +39,9 @@ class gameThread(Thread):
 
 # CONSTS
 BOX: Tuple[int, int, int, int] = (0, 0, 1920, 1080)
-TOPBOX: Tuple[int, int] = (1424, 520)
-MIDBOX: Tuple[int, int] = (1424, 700)
-LOWBOX: Tuple[int, int] = (1424, 880)
+TOPBOX: Tuple[int, int] = (1488, 489)
+MIDBOX: Tuple[int, int] = (1488, 636)
+LOWBOX: Tuple[int, int] = (1488, 789)
 REGION: Dict[str, Tuple[int, int]] = {
     'top': TOPBOX,
     'mid': MIDBOX,
@@ -63,9 +63,9 @@ MOVESREGION: Dict[int, str] = {
     1: 'mid',
     2: 'low'
 }
-HOME: Tuple[int, int] = (803, 866)
+HOME: Tuple[int, int] = (827, 815)
 HOMEVALUES: RGB = RGB(r = 20, g = 210, b = 240)
-BAD: Tuple[int, int] = (1212, 673)
+BAD: Tuple[int, int] = (1174, 667)
 BADVALUES: RGB = RGB(r = 230, g = 105, b = 35)
 LEVELMONKEY: Tuple[int, int] = (191, 905)
 LEVELMONKEYVALUES: RGB = RGB(r = 140, g = 100, b = 50)
@@ -73,7 +73,7 @@ LEVELBANNER: Tuple[int, int] = (1133, 548)
 LEVELBANNERVALUES: RGB = RGB(r = 220, g = 100, b = 40)
 LEVELSTAR: Tuple[int, int] = (958, 381)
 LEVELSTARVALUES: RGB = RGB(r = 230, g = 200, b = 20)
-PLACEMENT: Tuple[int, int] = (1207, 56)
+PLACEMENT: Tuple[int, int] = (1277, 72)
 PLACEMENTVALUES: RGB = RGB(r = 180, g = 170, b = 110)
 
 def windowEnumerationHandler(hwnd, top_windows):
@@ -274,11 +274,11 @@ def freeplay(dimRegion: Tuple[int, int], dimValues: RGB, towers: List[TOWER]) ->
     print('VICTORY achieved. Going into freeplay...')
     
     sleep(1)
-    moveTo(1194, 899)
-    click(1194, 899)
+    moveTo(1125, 858)
+    click(1125, 858)
     sleep(1)
-    moveTo(1024, 750)
-    click(1024, 750)
+    moveTo(968, 714)
+    click(968, 714)
 
 # Restart the game
 def restart(dimRegion: Tuple[int, int], dimValues: RGB, towers: List[TOWER], insta: str) -> None:
@@ -307,14 +307,14 @@ def restart(dimRegion: Tuple[int, int], dimValues: RGB, towers: List[TOWER], ins
     
     defaultUpgrades(towers)
     sleep(1)
-    moveTo(1556, 50)
-    click(1556, 50)
+    moveTo(1600, 44)
+    click(1600, 44)
     sleep(1)
-    moveTo(1128, 887)
-    click(1128, 887)
+    moveTo(1070, 854)
+    click(1070, 854)
     sleep(1)
-    moveTo(1196, 748)
-    click(1196, 748)
+    moveTo(1120, 723)
+    click(1120, 723)
 
 # Close all threads and exit the program on Ctrl + C key combination
 def signal_handler(sig, frame) -> None:

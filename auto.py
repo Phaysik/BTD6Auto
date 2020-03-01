@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
 Author   : Matthew Moore
-Revision : 2020-01-06
-Date     : 2019-12-28
+Revision : 2020-01-07
+Date     : 2020-01-06
 """
 
 from tkinter import *
@@ -91,14 +91,14 @@ class Maps:
     def round40(self, name: str, difficulty: str) -> None:
         if (name == 'Monkey Meadow'):
             if (difficulty == 'Easy'):
-                from monkeyMeadow import mmes
-                mmes.xp()
+                from monkeyMeadow.mmes import xp
+                xp()
                 
     def round100(self, name: str, difficulty: str) -> None:
         if (name == 'Monkey Meadow'):
             if (difficulty == 'Easy'):
-                from monkeyMeadow import mmes
-                mmes.insta()
+                from monkeyMeadow.mmes import insta
+                insta()
                 
 def parseJSON() -> Dict[str, List[Dict[str, Union[str, List[str]]]]]:
     data: str = ''
