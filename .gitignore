@@ -1,7 +1,9 @@
 .vscode
 .mypy_cache
 __pycache__
-mouse.py
+position.py
 command.txt
 gui.spec
 build
+Tesseract
+doc
