@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
 Author   : Matthew Moore
-Revision : 2020-12-19
-Date     : 2019-12-29
+Revision : 12/21/2020
+Date     : 12/29/2019
 """
 
 import os
@@ -80,9 +80,20 @@ def xp() -> None:
         sleep(1)
         gamePress("space", 2)
 
-        gamePlaceTower(0, ADORA, ALLTOWERS)
+        gamePlaceTower(-1, ADORA, ALLTOWERS)
+        sleep(0.5)
+
+        gamePlaceTower(-1, DART, ALLTOWERS)
+        sleep(0.5)
+
         gamePlaceTower(0, DART, ALLTOWERS)
+        sleep(0.5)
+
+        gamePlaceTower(-1, SUPER, ALLTOWERS)
+        sleep(0.5)
+
         gamePlaceTower(0, SUPER, ALLTOWERS)
+        sleep(0.5)
 
         freeplay()
 
@@ -113,20 +124,50 @@ def insta() -> None:
         sleep(1)
         gamePress("space", 2)
 
-        gamePlaceTower(0, ADORA, ALLTOWERS)
+        gamePlaceTower(-1, ADORA, ALLTOWERS)
+        sleep(0.5)
+
+        gamePlaceTower(-1, DART, ALLTOWERS)
+        sleep(0.5)
+
         gamePlaceTower(0, DART, ALLTOWERS)
+        sleep(0.5)
+
+        gamePlaceTower(-1, SUPER, ALLTOWERS)
+        sleep(0.5)
+
         gamePlaceTower(0, SUPER, ALLTOWERS)
+        sleep(0.5)
 
         freeplay()
 
         sleep(1)
+
         gamePress("space", 1)
 
+        gamePlaceTower(-1, TACK, ALLTOWERS)
+        sleep(0.5)
+
         gamePlaceTower(0, TACK, ALLTOWERS)
+        sleep(0.5)
+
+        gamePlaceTower(-1, VILLAGE, ALLTOWERS)
+        sleep(0.5)
+
         gamePlaceTower(0, VILLAGE, ALLTOWERS)
+        sleep(0.5)
+
+        gamePlaceTower(-1, ALCHEMIST, ALLTOWERS)
+        sleep(0.5)
+        
         gamePlaceTower(0, ALCHEMIST, ALLTOWERS)
+        sleep(0.5)
+
         gamePlaceTower(1, ALCHEMIST, ALLTOWERS)
+        sleep(0.5)
+
         gamePlaceTower(1, SUPER, ALLTOWERS)
+        sleep(0.5)
 
         restart(ALLTOWERS, "BAD", (522, 261), (602, 401), (605, 567))
 

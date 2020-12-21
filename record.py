@@ -7,7 +7,6 @@ Revision : 12/19/2020
 
 from datetime import date
 from typing import IO, Dict, List, Tuple, Optional, Union
-from PIL import ImageGrab
 from dataclasses import dataclass
 from keyboard import wait, on_press, KeyboardEvent
 from mouse import on_click, get_position
@@ -27,7 +26,7 @@ class TOWER:
 
 # Consts
 TOWERSKEY: Dict[str, str] = {
-    "u": "Hero",
+    "u": "Adora",
     "q": "Dart Monkey",
     "w": "Boomerang Monkey",
     "e": "Bomb Shooter",
@@ -61,6 +60,7 @@ gKey: Union[str, None] = None
 collectPath: Union[Dict[int, int], None] = None
 currentKeys: Union[Dict[int, int], None] = None
 towerCount: int = 0
+towerPlaceIndex: int = 0
 firstMonkey: str = ""
 stringTowerList: List[str] = []
 monkeyUpgradeOrder: List[Dict[str, int]] = []
@@ -93,18 +93,9 @@ def runner(f: IO) -> None:
     f.write("\t\tsleep(1)\n")
     f.write('\t\tgamePress("space", 2)\n\n')
 
-    if len(monkeyUpgradeOrder) > 0:
-        if "HERO0" in stringTowerList:
-            f.write(f"\t\tgamePlaceTower(0, HERO0, ALLTOWERS)\n")
-            f.write("\t\tsleep(0.5)\n\n")
-
-        for monkey in monkeyUpgradeOrder:
-            for k, v in monkey.items():
-                f.write(f"\t\tgamePlaceTower({v}, {k}, ALLTOWERS)\n")
-                f.write("\t\tsleep(0.5)\n\n")
-    else:
-        for tower in stringTowerList:
-            f.write(f"\t\tgamePlaceTower(0, {tower}, ALLTOWERS)\n")
+    for monkey in monkeyUpgradeOrder:
+        for k, v in monkey.items():
+            f.write(f"\t\tgamePlaceTower({v}, {k}, ALLTOWERS)\n")
             f.write("\t\tsleep(0.5)\n\n")
 
     f.write("\n\t\tfreeplay()\n\n")
@@ -246,6 +237,7 @@ def input(x: KeyboardEvent) -> None:
             abilities.append(x.name)
 
 
+# Return the distance from the mouse positon and the requested tower position
 def distance(x1: int, x2: int, y1: int, y2: int) -> float:
     return sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2)
 
@@ -259,6 +251,7 @@ def clicker() -> None:
     global collectPath
     global currentKeys
     global monkeyUpgradeOrder
+    global towerPlaceIndex
     inList: bool = False
     pos: Tuple[int, int] = get_position()
     closest: Union[TOWER, None] = None
@@ -284,6 +277,12 @@ def clicker() -> None:
                 TOWER(pos[0], pos[1], towerName, False, gKey, [], [0, 0, 0])
             )
 
+        monkeyUpgradeOrder.append(
+            {f'{towerName.replace(" ", "_").upper()}{towerPlaceIndex}': -1}
+        )
+
+        towerPlaceIndex += 1
+
         towerName = None
         gKey = None
     else:
@@ -295,6 +294,7 @@ def clicker() -> None:
                 and isinstance(collectPath, dict)
                 and tower.name != "Hero"
             ):
+                print(currTower)
                 tower.path.append(collectPath)
                 collectPath = None
                 currentKeys = None

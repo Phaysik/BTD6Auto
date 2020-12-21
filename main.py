@@ -1,27 +1,22 @@
 #!/usr/bin/env python3
 """
 Author   : Matthew Moore
-Revision : 2020-12-19
-Date     : 2019-12-28
+Revision : 12/21/2020
+Date     : 12/28/2019
 """
 
 from pyautogui import click, press, moveTo
-import win32gui
-from typing import List, Tuple, Dict, Optional, Union
+from win32gui import EnumWindows, ShowWindow, SetForegroundWindow, GetWindowText
+from typing import List, Optional, Union
 from time import sleep
 from PIL import ImageGrab, Image
-from dataclasses import dataclass
 from threading import Thread, currentThread
 from os import system, name
-from pytesseract import image_to_string, pytesseract
-from fuzzywuzzy.fuzz import partial_ratio
-
-
-@dataclass
-class RGB:
-    r: int
-    g: int
-    b: int
+from pytesseract import image_to_string
+from fuzzywuzzy.fuzz import partial_ratio, ratio
+from math import sqrt
+from mouse import get_position
+from globals import *
 
 
 @dataclass
@@ -41,49 +36,8 @@ class gameThread(Thread):
         self.do_run = True
 
 
-# CONSTS
-BOX: Tuple[int, int, int, int] = (0, 0, 1920, 1080)
-TOPBOX: Tuple[int, int] = (1488, 489)
-MIDBOX: Tuple[int, int] = (1488, 636)
-LOWBOX: Tuple[int, int] = (1488, 789)
-REGION: Dict[str, Tuple[int, int]] = {"top": TOPBOX, "mid": MIDBOX, "low": LOWBOX}
-MOVES: Dict[int, str] = {0: ",", 1: ".", 2: "/"}
-MOVESREGION: Dict[int, str] = {0: "top", 1: "mid", 2: "low"}
-TOWERRIGHTBOXES: Dict[str, Tuple[int, int, int, int]] = {
-    "Hero": (1378, 59, 1513, 96),
-    "Dart Monkey": (1307, 52, 1580, 100),
-    "Boomerang Monkey": (1278, 54, 1610, 96),
-    "Bomb Shooter": (1304, 51, 1587, 101),
-    "Tack Shooter": (1308, 57, 1587, 101),
-    "Ice Monkey": (1333, 54, 1558, 99),
-    "Glue Gunner": (1312, 52, 1570, 96),
-    "Sniper Monkey": (1298, 54, 1589, 98),
-    "Monkey Sub": (1322, 55, 1560, 98),
-    "Monkey Bucanneer": (1275, 53, 1603, 94),
-    "Monkey Ace": (1325, 55, 1559, 97),
-    "Heli Pilot": (1343, 54, 1545, 99),
-    "Mortar Monkey": (1288, 55, 1599, 100),
-    "Dartling Gunner": (1273, 55, 1608, 98),
-    "Wizard Monkey": (1274, 51, 1606, 99),
-    "Super Monkey": (1302, 55, 1583, 101),
-    "Ninja Monkey": (1302, 55, 1583, 101),
-    "Alchemist": (1330, 56, 1557, 98),
-    "Druid": (1372, 56, 1512, 94),
-    "Banana Farm": (1302, 55, 1583, 101),
-    "Spike Factory": (1302, 55, 1583, 101),
-    "Monkey Village": (1302, 55, 1583, 101),
-    "Engineer Monkey": (1271, 52, 1609, 100),
-}
-LEVELDIMENSIONS: Tuple[int, int, int, int] = (815, 531, 1087, 611)
-NEXTBUTTON: Tuple[int, int, int, int] = (888, 879, 1063, 948)
-FREEPLAYBUTTON: Tuple[int, int, int, int] = (1010, 911, 1233, 966)
-INSTATEXT: Tuple[int, int, int, int] = (733, 624, 1158, 709)
-
-pytesseract.tesseract_cmd = "../Tesseract/tesseract.exe"
-
-
 def windowEnumerationHandler(hwnd, top_windows):
-    top_windows.append((hwnd, win32gui.GetWindowText(hwnd)))
+    top_windows.append((hwnd, GetWindowText(hwnd)))
 
 
 # Click in a certain location
@@ -107,19 +61,28 @@ def gameSafeClick() -> None:
     click(100, 100)
 
 
+# Return the distance from the mouse positon and the requested tower position
+def distance(x1: int, x2: int, y1: int, y2: int) -> float:
+    return sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2)
+
+
 # Place and upgrade tower
 def gamePlaceTower(index: int, tower: TOWER, allTowers: List[TOWER]) -> None:
-    if index == 0:
+    if index == -1:
         nextTower(tower)
 
         name: str = determinePlacement(tower.name)
+        pos: Tuple[int, int] = get_position()
+        dist: float = distance(tower.x, pos[0], tower.y, pos[1])
 
-        while partial_ratio(name.lower(), tower.name.lower()) < 70:
+        while ratio(name.lower(), tower.name.lower()) < 70 or dist > 50:
             gamePress(tower.key, 1)
             gameClick(tower, 2)
 
             sleep(0.2)
             name = determinePlacement(tower.name)
+            pos = get_position()
+            dist = distance(tower.x, pos[0], tower.y, pos[1])
 
         placing(tower)
     else:
@@ -131,6 +94,7 @@ def gamePlaceTower(index: int, tower: TOWER, allTowers: List[TOWER]) -> None:
         tower.path is not None
         and tower.currUpgrades is not None
         and len(tower.path) > 0
+        and index >= 0
     ):
         for key, value in tower.path[index].items():
             for i in range(value):
@@ -148,13 +112,12 @@ def gamePlaceTower(index: int, tower: TOWER, allTowers: List[TOWER]) -> None:
 
 # Set active window
 def activeWindow() -> None:
-    results: List[str] = []
     top_windows: List[str] = []
-    win32gui.EnumWindows(windowEnumerationHandler, top_windows)
+    EnumWindows(windowEnumerationHandler, top_windows)
     for i in top_windows:
         if "bloonstd6" in i[1].lower():
-            win32gui.ShowWindow(i[0], 5)
-            win32gui.SetForegroundWindow(i[0])
+            ShowWindow(i[0], 5)
+            SetForegroundWindow(i[0])
             break
 
 
@@ -167,7 +130,7 @@ def getImage() -> Image:
 # Determine if an upgrade is available to purchase
 def determineMove(region: str) -> bool:
     IMAGE: Tuple[int, int, int] = getImage().getpixel(REGION[region])
-    return (IMAGE[0] >= 60) and (IMAGE[1] >= 200) and (IMAGE[2] <= 20)
+    return (IMAGE[0] >= MOVE.r) and (IMAGE[1] >= MOVE.g) and (IMAGE[2] <= MOVE.b)
 
 
 # Determine if the user has leveled up

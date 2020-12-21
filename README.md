@@ -4,10 +4,23 @@ This program can automate running BTD6 maps, and can even record your own run fo
 
 ## Requirements
 
-- Python3 64bit
-  - Download at: <https://www.python.org/downloads/release/python-381/>
-- 1920x1080 resolution
-- In-game fullscreen
+- Download [Python3](https://www.python.org/downloads//)
+  - This program was written and tested for 64bit
+- This project is tested and written based on:
+
+  - 1920x1080 resolution
+  - In-game fullscreen
+  - You can change this by altering the values stored in the `globals.py` config file.
+
+    - Please note, that you will most likely have to change all of the values in some way or another if you do decide on a different resolution.
+    - In order to determine what values to change to, run
+
+      - ```bash
+        python position.py
+        ```
+
+    - To determine the x, y coordinates of the mouse
+
 - Program specfic dependencies (Run through command line)
 
   ```bash
@@ -18,7 +31,7 @@ This program can automate running BTD6 maps, and can even record your own run fo
 
 ## Requirements to run auto run maps
 
-- Please note that some Monkey Knowledge is pobably required in order to successfully run maps
+- Please note that some Monkey Knowledge is pobably required in order to successfully run map scripts that I have created
 - You must have the game open
 - You must be in the map itself
 
@@ -31,16 +44,15 @@ This program can automate running BTD6 maps, and can even record your own run fo
   - Towers placed on the right side of the map
     - ![Good Placement](/img/GoodPlacement.png)
     - ![Good Placement](/img/BadPlacement.png)
-  - Tower placement order if they are not upgraded after being placed
-    - ![Upgrade Order](/img/UpgradeOrder.png)
   - Round 100 (Getting an Insta-Monkey)
+  - Any hero other than Adora
 
 - This version currently supports:
   - Placing towers
   - Upgrading towers
     - It's able to distinguish between two towers that are the same and are in close proximity which tower you want to upgrade, based on your mouse position
   - Tower upgrade order
-  - Tower placement order if they are upgraded after being placed
+  - Tower placement order
 
 ```bash
 python record.py
