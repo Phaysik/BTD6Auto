@@ -80,19 +80,19 @@ def xp() -> None:
         sleep(1)
         gamePress("space", 2)
 
-        gamePlaceTower(-1, ADORA, ALLTOWERS)
+        towerManip(-1, ADORA, ALLTOWERS)
         sleep(0.5)
 
-        gamePlaceTower(-1, DART, ALLTOWERS)
+        towerManip(-1, DART, ALLTOWERS)
         sleep(0.5)
 
-        gamePlaceTower(0, DART, ALLTOWERS)
+        towerManip(0, DART, ALLTOWERS)
         sleep(0.5)
 
-        gamePlaceTower(-1, SUPER, ALLTOWERS)
+        towerManip(-1, SUPER, ALLTOWERS)
         sleep(0.5)
 
-        gamePlaceTower(0, SUPER, ALLTOWERS)
+        towerManip(0, SUPER, ALLTOWERS)
         sleep(0.5)
 
         freeplay()
@@ -124,19 +124,19 @@ def insta() -> None:
         sleep(1)
         gamePress("space", 2)
 
-        gamePlaceTower(-1, ADORA, ALLTOWERS)
+        towerManip(-1, ADORA, ALLTOWERS)
         sleep(0.5)
 
-        gamePlaceTower(-1, DART, ALLTOWERS)
+        towerManip(-1, DART, ALLTOWERS)
         sleep(0.5)
 
-        gamePlaceTower(0, DART, ALLTOWERS)
+        towerManip(0, DART, ALLTOWERS)
         sleep(0.5)
 
-        gamePlaceTower(-1, SUPER, ALLTOWERS)
+        towerManip(-1, SUPER, ALLTOWERS)
         sleep(0.5)
 
-        gamePlaceTower(0, SUPER, ALLTOWERS)
+        towerManip(0, SUPER, ALLTOWERS)
         sleep(0.5)
 
         freeplay()
@@ -145,28 +145,28 @@ def insta() -> None:
 
         gamePress("space", 1)
 
-        gamePlaceTower(-1, TACK, ALLTOWERS)
+        towerManip(-1, TACK, ALLTOWERS)
         sleep(0.5)
 
-        gamePlaceTower(0, TACK, ALLTOWERS)
+        towerManip(0, TACK, ALLTOWERS)
         sleep(0.5)
 
-        gamePlaceTower(-1, VILLAGE, ALLTOWERS)
+        towerManip(-1, VILLAGE, ALLTOWERS)
         sleep(0.5)
 
-        gamePlaceTower(0, VILLAGE, ALLTOWERS)
+        towerManip(0, VILLAGE, ALLTOWERS)
         sleep(0.5)
 
-        gamePlaceTower(-1, ALCHEMIST, ALLTOWERS)
+        towerManip(-1, ALCHEMIST, ALLTOWERS)
         sleep(0.5)
         
-        gamePlaceTower(0, ALCHEMIST, ALLTOWERS)
+        towerManip(0, ALCHEMIST, ALLTOWERS)
         sleep(0.5)
 
-        gamePlaceTower(1, ALCHEMIST, ALLTOWERS)
+        towerManip(1, ALCHEMIST, ALLTOWERS)
         sleep(0.5)
 
-        gamePlaceTower(1, SUPER, ALLTOWERS)
+        towerManip(1, SUPER, ALLTOWERS)
         sleep(0.5)
 
         restart(ALLTOWERS, "BAD", (522, 261), (602, 401), (605, 567))

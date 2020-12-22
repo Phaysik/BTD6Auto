@@ -11,6 +11,7 @@ from dataclasses import dataclass
 from keyboard import wait, on_press, KeyboardEvent
 from mouse import on_click, get_position
 from math import sqrt
+from json import load
 
 
 @dataclass
@@ -26,7 +27,7 @@ class TOWER:
 
 # Consts
 TOWERSKEY: Dict[str, str] = {
-    "u": "Adora",
+    "u": "Hero",
     "q": "Dart Monkey",
     "w": "Boomerang Monkey",
     "e": "Bomb Shooter",
@@ -65,6 +66,11 @@ firstMonkey: str = ""
 stringTowerList: List[str] = []
 monkeyUpgradeOrder: List[Dict[str, int]] = []
 abilities: List[str] = []
+heroName: str = ""
+gameMode: str = ""
+mapName: str = ""
+difficulty: str = ""
+gameType: str = ""
 
 # Write the boilerplate header and includes for the program
 def header(f: IO) -> None:
@@ -88,6 +94,7 @@ def runner(f: IO) -> None:
     f.write("\t\tlevelUp: gameThread = levelThread(ALLTOWERS)\n")
     f.write("\t\tability = abilityThread(ABILITIES)\n\n")
     f.write("\t\tclear()\n\n")
+    f.write(f'\t\tprint("Starting {mapName} - {difficulty} - {gameType}")\n')
     f.write('\t\tprint(f"Current iteration: {iteration}")\n\n')
     f.write("\t\tactiveWindow()\n\n")
     f.write("\t\tsleep(1)\n")
@@ -95,7 +102,11 @@ def runner(f: IO) -> None:
 
     for monkey in monkeyUpgradeOrder:
         for k, v in monkey.items():
-            f.write(f"\t\tgamePlaceTower({v}, {k}, ALLTOWERS)\n")
+            f.write(f"\t\ttowerManip({v}, {k}, ALLTOWERS)\n")
+            if v == -2:
+                f.write("\t\tsleep(1)\n")
+                f.write(f"\t\tselling('{k.replace('_', ' ').title()[:-1]}')\n")
+                f.write('\t\tgamePress("backspace", 1)\n')
             f.write("\t\tsleep(0.5)\n\n")
 
     f.write("\n\t\tfreeplay()\n\n")
@@ -129,7 +140,7 @@ def writeTower(
 
     towerString += f'{name.replace(" ", "_").upper()}{towerCount}: TOWER = TOWER(x = {x}, y = {y}, name = \'{name}\', currMonkey = {current}, key = \'{key}\''
 
-    if name == "Hero":
+    if name not in TOWERSKEY.values():
         towerString += ")\n"
     elif isinstance(path, list):
         towerString += f", path = {path}, currUpgrades = [0, 0, 0])\n"
@@ -149,6 +160,9 @@ def input(x: KeyboardEvent) -> None:
     global collectPath
     global currentKeys
     global abilities
+    global heroName
+    global currTower
+    global monkeyUpgradeOrder
     towerName = None
     hero: bool = False
     top: bool = True
@@ -161,80 +175,96 @@ def input(x: KeyboardEvent) -> None:
     for key, value in TOWERSKEY.items():
         if x.name == key:
             gKey = key
-            towerName = value
+
+            if x.name == "u":
+                towerName = heroName
+            else:
+                towerName = value
+
             hero = True
             break
 
-    if not hero and currTower != None and x.name in MOVESLIST.keys():
-        for tower in towerList:
-            if currTower == tower:
-                if collectPath == None:
-                    collectPath = {}
-                    currentKeys = {0: 0, 1: 0, 2: 0}
+    if not hero:
+        if currTower != None and x.name in MOVESLIST.keys():
+            for tower in towerList:
+                if currTower == tower:
+                    if collectPath == None:
+                        collectPath = {}
+                        currentKeys = {0: 0, 1: 0, 2: 0}
 
-                if isinstance(currentKeys, dict):
-                    for k, v in currentKeys.items():
-                        if k == 0:
-                            topVal = v
-                        elif k == 1:
-                            midVal = v
-                        else:
-                            bottomVal = v
-
-                        if topVal > 0 and midVal > 0:
-                            if topVal > 2 and midVal == 2:
-                                mid = False
-                            elif midVal > 2 and topVal == 2:
-                                top = False
-
-                            bottom = False
-                        elif topVal > 0 and bottomVal > 0:
-                            if topVal > 2 and bottomVal == 2:
-                                bottom = False
-                            elif bottomVal > 2 and topVal == 2:
-                                top = False
-
-                            mid = False
-                        elif midVal > 0 and bottomVal > 0:
-                            if midVal > 2 and bottomVal == 2:
-                                bottom = False
-                            elif bottomVal > 2 and midVal == 2:
-                                mid = False
-
-                            top = False
-
-                        if v > 5:
+                    if isinstance(currentKeys, dict):
+                        for k, v in currentKeys.items():
                             if k == 0:
-                                top = False
+                                topVal = v
                             elif k == 1:
-                                mid = False
-                            elif k == 2:
+                                midVal = v
+                            else:
+                                bottomVal = v
+
+                            if topVal > 0 and midVal > 0:
+                                if topVal > 2 and midVal == 2:
+                                    mid = False
+                                elif midVal > 2 and topVal == 2:
+                                    top = False
+
                                 bottom = False
+                            elif topVal > 0 and bottomVal > 0:
+                                if topVal > 2 and bottomVal == 2:
+                                    bottom = False
+                                elif bottomVal > 2 and topVal == 2:
+                                    top = False
 
-                    if isinstance(collectPath, dict):
-                        if x.name == "," and top:
-                            currentKeys[0] += 1
-                            if MOVESLIST[x.name] not in collectPath:
-                                collectPath[MOVESLIST[x.name]] = 1
-                            else:
-                                collectPath[MOVESLIST[x.name]] += 1
-                        elif x.name == "." and mid:
-                            currentKeys[1] += 1
-                            if MOVESLIST[x.name] not in collectPath:
-                                collectPath[MOVESLIST[x.name]] = 1
-                            else:
-                                collectPath[MOVESLIST[x.name]] += 1
-                        elif x.name == "/" and bottom:
-                            currentKeys[2] += 1
-                            if MOVESLIST[x.name] not in collectPath:
-                                collectPath[MOVESLIST[x.name]] = 1
-                            else:
-                                collectPath[MOVESLIST[x.name]] += 1
-                break
+                                mid = False
+                            elif midVal > 0 and bottomVal > 0:
+                                if midVal > 2 and bottomVal == 2:
+                                    bottom = False
+                                elif bottomVal > 2 and midVal == 2:
+                                    mid = False
 
-    if not hero and x.name in [str(x) for x in range(10)]:
-        if x.name not in abilities:
-            abilities.append(x.name)
+                                top = False
+
+                            if v > 5:
+                                if k == 0:
+                                    top = False
+                                elif k == 1:
+                                    mid = False
+                                elif k == 2:
+                                    bottom = False
+
+                        if isinstance(collectPath, dict):
+                            if x.name == "," and top:
+                                currentKeys[0] += 1
+                                if MOVESLIST[x.name] not in collectPath:
+                                    collectPath[MOVESLIST[x.name]] = 1
+                                else:
+                                    collectPath[MOVESLIST[x.name]] += 1
+                            elif x.name == "." and mid:
+                                currentKeys[1] += 1
+                                if MOVESLIST[x.name] not in collectPath:
+                                    collectPath[MOVESLIST[x.name]] = 1
+                                else:
+                                    collectPath[MOVESLIST[x.name]] += 1
+                            elif x.name == "/" and bottom:
+                                currentKeys[2] += 1
+                                if MOVESLIST[x.name] not in collectPath:
+                                    collectPath[MOVESLIST[x.name]] = 1
+                                else:
+                                    collectPath[MOVESLIST[x.name]] += 1
+                    break
+        elif x.name in [str(x) for x in range(10)]:
+            if x.name not in abilities:
+                abilities.append(x.name)
+        elif x.name == "backspace" and currTower != None:
+            index: int = 0
+
+            for tower in towerList:
+                if tower == currTower:
+                    print("y")
+                    monkeyUpgradeOrder.append(
+                        {f'{currTower.name.replace(" ", "_").upper()}{index}': -2}
+                    )
+                    break
+                index += 1
 
 
 # Return the distance from the mouse positon and the requested tower position
@@ -287,6 +317,7 @@ def clicker() -> None:
         gKey = None
     else:
         index: int = 0
+
         for tower in towerList:
             if (
                 tower == currTower
@@ -294,7 +325,6 @@ def clicker() -> None:
                 and isinstance(collectPath, dict)
                 and tower.name != "Hero"
             ):
-                print(currTower)
                 tower.path.append(collectPath)
                 collectPath = None
                 currentKeys = None
@@ -315,6 +345,23 @@ def clicker() -> None:
 
 
 def main() -> None:
+    global heroName
+    global gameMode
+    global mapName
+    global difficulty
+    global gameType
+
+    json: Dict[str, str] = {}
+
+    with open("./config.json") as f:
+        json = load(f)
+
+    heroName = json["hero"]
+    gameMode = json["gamemode"]
+    mapName = json["mapname"]
+    difficulty = json["difficulty"]
+    gameType = json["gametype"]
+
     on_press(input, suppress=False)
     on_click(clicker)
 

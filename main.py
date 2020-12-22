@@ -66,8 +66,8 @@ def distance(x1: int, x2: int, y1: int, y2: int) -> float:
     return sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2)
 
 
-# Place and upgrade tower
-def gamePlaceTower(index: int, tower: TOWER, allTowers: List[TOWER]) -> None:
+# Place, upgrade, sell towers
+def towerManip(index: int, tower: TOWER, allTowers: List[TOWER]) -> None:
     if index == -1:
         nextTower(tower)
 
@@ -75,7 +75,7 @@ def gamePlaceTower(index: int, tower: TOWER, allTowers: List[TOWER]) -> None:
         pos: Tuple[int, int] = get_position()
         dist: float = distance(tower.x, pos[0], tower.y, pos[1])
 
-        while ratio(name.lower(), tower.name.lower()) < 70 or dist > 50:
+        while ratio(name.lower(), tower.name.lower()) < 80 or dist > 50:
             gamePress(tower.key, 1)
             gameClick(tower, 2)
 
@@ -107,7 +107,8 @@ def gamePlaceTower(index: int, tower: TOWER, allTowers: List[TOWER]) -> None:
                 upgrades(tower)
                 gamePress(MOVES[key], 1)
 
-    gameSafeClick()
+    if index != -2:
+        gameSafeClick()
 
 
 # Set active window
@@ -177,6 +178,11 @@ def upgrades(tower: TOWER) -> None:
         print(
             f'Upgrading {tower.name} to {"-".join([str(i) for i in tower.currUpgrades])}.'
         )
+
+
+def selling(tower: str) -> None:
+    pos: Tuple[int, int] = get_position()
+    print(f"Selling {tower} at ({pos[0]}, {pos[1]})")
 
 
 # Set all towers currUpgrades attribute back to 0

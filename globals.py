@@ -20,7 +20,7 @@ class RGB:
 # CONSTS
 
 # The RGB to determine whether the move is availble to purchase
-MOVE: RGB = RGB(r = 60, g = 200, b = 20)
+MOVE: RGB = RGB(r=60, g=200, b=20)
 
 # Screen dimensions
 BOX: Tuple[int, int, int, int] = (0, 0, 1920, 1080)

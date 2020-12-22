@@ -39,7 +39,6 @@ This program can automate running BTD6 maps, and can even record your own run fo
 
 - This version currently does not support:
 
-  - Selling of towers
   - Tower Targeting (First, Last, ...)
   - Towers placed on the right side of the map
     - ![Good Placement](/img/GoodPlacement.png)
@@ -53,6 +52,7 @@ This program can automate running BTD6 maps, and can even record your own run fo
     - It's able to distinguish between two towers that are the same and are in close proximity which tower you want to upgrade, based on your mouse position
   - Tower upgrade order
   - Tower placement order
+  - Selling towers
 
 ```bash
 python record.py
@@ -61,16 +61,22 @@ python record.py
 ### Rules for recording
 
 - Please note that this script requires a lot of perfect inputs from the user
-
 - You must use keybindings to select the tower you want to place
   - After hitting a key, you must then place the tower in an appropriate location. This program does not determine if the tower is placed properly.
 - You must use keybindings to upgrade the towers
   - After selecting all the upgrades you want, click in any open space to save those upgrades in the tower's upgrade path list
+- You must use `backspace` to sell a tower
 - If you press any numeric key [0-9]
   - It will assume that those are abilities and will constantly send those keypresses whenever you run the completed script.
   - So make sure to only use abilities that do not require anything other than just pressing the key
 - When you have completed the map, the victory screen has shown up, press Ctrl+C in order for the script to recognize the completion of the map, and to then write all the required information to a file called `map.py` in the top-level directory.
   - If you then want to run the script it just created, you must put it in a subfolder because of how the main python file determines the Tesseract executable location
+- Modify the `config.json` in the `Recording` directory in order to change how the final script will be executed
+  - Change hero (Any valid hero name)
+  - Change gamemode (Freeplay, Insta-Monkey)
+  - Change map name
+  - Change difficulty
+  - Change game type (CHIMPS, Double HP Moabs, etc...)
 
 ## Running the Program
 
