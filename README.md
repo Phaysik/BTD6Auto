@@ -5,14 +5,14 @@ This program can automate running BTD6 maps, and can even record your own run fo
 ## Requirements
 
 - Download [Python3](https://www.python.org/downloads//)
-  - This program was written and tested for 64bit
+  - This program was written and tested for 64bit with Python 3.9.1
 - This project is tested and written based on:
 
   - 1920x1080 resolution
   - In-game fullscreen
   - You can change this by altering the values stored in the `globals.py` config file.
 
-    - Please note, that you will most likely have to change all of the values in some way or another if you do decide on a different resolution.
+    - Please note, that you will most likely have to change most of the values in some way or another if you do decide on a different resolution.
     - In order to determine what values to change to, run
 
       - ```bash
@@ -56,6 +56,7 @@ This program can automate running BTD6 maps, and can even record your own run fo
   - Tab Targeting
 
 ```bash
+cd path/to/BTD6Auto/Recording
 python record.py
 ```
 
@@ -71,8 +72,8 @@ python record.py
 - If you press any numeric key [0-9]
   - It will assume that those are abilities and will constantly send those keypresses whenever you run the completed script.
   - So make sure to only use abilities that do not require anything other than just pressing the key
-- When you have completed the map, the victory screen has shown up, press Ctrl+C in order for the script to recognize the completion of the map, and to then write all the required information to a file called `map.py` in the top-level directory.
-  - If you then want to run the script it just created, you must put it in a subfolder because of how the main python file determines the Tesseract executable location
+- When you have completed the map, the victory screen has shown up, press Ctrl+C in order for the script to recognize the completion of the map, and to then write all the required information to a file called `map.py` in the `Recording` directory.
+  - If you then want to run the script it just created, you must put it in a subfolder of the top-level directory, because of how the main python file determines the Tesseract executable location
 - Modify the `config.json` in the `Recording` directory in order to change how the final script will be executed
   - Change hero (Any valid hero name)
   - Change gamemode (Freeplay, Insta-Monkey)
