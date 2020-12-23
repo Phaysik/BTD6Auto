@@ -86,7 +86,8 @@ def towerManip(index: int, tower: TOWER, allTowers: List[TOWER]) -> None:
 
         placing(tower)
     else:
-        gameClick(tower, 1)
+        if tower.currMonkey == False:
+            gameClick(tower, 1)
 
     setCurrentMonkey(tower, allTowers)
 
@@ -107,8 +108,9 @@ def towerManip(index: int, tower: TOWER, allTowers: List[TOWER]) -> None:
                 upgrades(tower)
                 gamePress(MOVES[key], 1)
 
-    if index != -2:
+    if index > -2:
         gameSafeClick()
+        setCurrentMonkey(tower, allTowers, True)
 
 
 # Set active window
@@ -180,9 +182,16 @@ def upgrades(tower: TOWER) -> None:
         )
 
 
+# Print out what tower is being sold
 def selling(tower: str) -> None:
     pos: Tuple[int, int] = get_position()
     print(f"Selling {tower} at ({pos[0]}, {pos[1]})")
+
+
+# Print out what tower is being sold
+def targeting(tower: str) -> None:
+    pos: Tuple[int, int] = get_position()
+    print(f"Changing the targeting of {tower} at ({pos[0]}, {pos[1]})")
 
 
 # Set all towers currUpgrades attribute back to 0
@@ -245,9 +254,9 @@ def killThread(thread: gameThread) -> None:
 
 
 # Set the current monkey being upgraded
-def setCurrentMonkey(tower: TOWER, towers: List[TOWER]) -> None:
+def setCurrentMonkey(tower: TOWER, towers: List[TOWER], deselect: bool = False) -> None:
     for monkey in towers:
-        if tower == monkey:
+        if tower == monkey and not deselect:
             monkey.currMonkey = True
         else:
             monkey.currMonkey = False

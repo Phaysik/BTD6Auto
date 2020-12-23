@@ -21,6 +21,7 @@ class TOWER:
     name: str
     currMonkey: bool
     key: str
+    sold: bool
     path: Optional[List[Dict[int, int]]] = None
     currUpgrades: Optional[List[int]] = None
 
@@ -107,6 +108,10 @@ def runner(f: IO) -> None:
                 f.write("\t\tsleep(1)\n")
                 f.write(f"\t\tselling('{k.replace('_', ' ').title()[:-1]}')\n")
                 f.write('\t\tgamePress("backspace", 1)\n')
+            elif v == -3:
+                f.write("\t\tsleep(1)\n")
+                f.write(f"\t\ttargeting('{k.replace('_', ' ').title()[:-1]}')\n")
+                f.write('\t\tgamePress("tab", 1)\n')
             f.write("\t\tsleep(0.5)\n\n")
 
     f.write("\n\t\tfreeplay()\n\n")
@@ -254,17 +259,27 @@ def input(x: KeyboardEvent) -> None:
         elif x.name in [str(x) for x in range(10)]:
             if x.name not in abilities:
                 abilities.append(x.name)
-        elif x.name == "backspace" and currTower != None:
+        elif isinstance(currTower, TOWER):
             index: int = 0
+            action: int = 0
 
+            add: bool = False
             for tower in towerList:
                 if tower == currTower:
-                    print("y")
-                    monkeyUpgradeOrder.append(
-                        {f'{currTower.name.replace(" ", "_").upper()}{index}': -2}
-                    )
+                    if x.name == "backspace":
+                        tower.sold = True
+                        action = -2
+                        add = True
+                    elif x.name == "tab":
+                        action = -3
+                        add = True
                     break
                 index += 1
+
+            if add:
+                monkeyUpgradeOrder.append(
+                    {f'{currTower.name.replace(" ", "_").upper()}{index}': action}
+                )
 
 
 # Return the distance from the mouse positon and the requested tower position
@@ -291,7 +306,7 @@ def clicker() -> None:
 
     for tower in towerList:
         towerDistance = distance(pos[0], tower.x, pos[1], tower.y)
-        if towerDistance < smallestDistance:
+        if tower.sold == False and towerDistance < smallestDistance:
             smallestDistance = towerDistance
             closest = tower
 
@@ -301,10 +316,10 @@ def clicker() -> None:
 
     if isinstance(gKey, str) and isinstance(towerName, str) and not inList:
         if gKey == "u":
-            towerList.append(TOWER(pos[0], pos[1], towerName, False, gKey))
+            towerList.append(TOWER(pos[0], pos[1], towerName, False, gKey, False))
         else:
             towerList.append(
-                TOWER(pos[0], pos[1], towerName, False, gKey, [], [0, 0, 0])
+                TOWER(pos[0], pos[1], towerName, False, gKey, False, [], [0, 0, 0])
             )
 
         monkeyUpgradeOrder.append(

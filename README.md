@@ -39,7 +39,7 @@ This program can automate running BTD6 maps, and can even record your own run fo
 
 - This version currently does not support:
 
-  - Tower Targeting (First, Last, ...)
+  - Shift+Tab Targeting
   - Towers placed on the right side of the map
     - ![Good Placement](/img/GoodPlacement.png)
     - ![Good Placement](/img/BadPlacement.png)
@@ -53,6 +53,7 @@ This program can automate running BTD6 maps, and can even record your own run fo
   - Tower upgrade order
   - Tower placement order
   - Selling towers
+  - Tab Targeting
 
 ```bash
 python record.py
@@ -66,6 +67,7 @@ python record.py
 - You must use keybindings to upgrade the towers
   - After selecting all the upgrades you want, click in any open space to save those upgrades in the tower's upgrade path list
 - You must use `backspace` to sell a tower
+- You must use `tab` to change the targeting of a tower
 - If you press any numeric key [0-9]
   - It will assume that those are abilities and will constantly send those keypresses whenever you run the completed script.
   - So make sure to only use abilities that do not require anything other than just pressing the key
