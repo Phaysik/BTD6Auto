@@ -79,7 +79,6 @@ def towerManip(index: int, tower: TOWER, allTowers: List[TOWER]) -> None:
             gamePress(tower.key, 1)
             gameClick(tower, 2)
 
-            sleep(0.2)
             name = determinePlacement(tower.name)
             pos = get_position()
             dist = distance(tower.x, pos[0], tower.y, pos[1])
@@ -138,11 +137,13 @@ def determineMove(region: str) -> bool:
 
 # Determine if the user has leveled up
 def determineLevelUp() -> bool:
-    return partial_ratio(getTextFromImage(LEVELDIMENSIONS), "Level Up!") >= 90
+    return ratio(getTextFromImage(LEVELDIMENSIONS), "Level Up!") >= 90
 
 
 # Get the towers name from an image
 def getTextFromImage(box: Tuple[int, int, int, int]) -> str:
+    sleep(0.5)
+
     return (
         image_to_string(ImageGrab.grab(box)).replace("\n", "").lower().strip().title()
     )
@@ -209,19 +210,21 @@ def clear():
 # Deal with any potential level ups as they appear
 def level(towers: List[TOWER]) -> None:
     t = currentThread()
+
     while getattr(t, "do_run", True):
         if determineLevelUp():
             print("Level up detected. Attempting to clear and continue program...")
 
             for tower in towers:
-                if tower.currMonkey:
-                    for i in range(2):
-                        sleep(0.2)
-                        moveTo(1470, 298)
-                        click(1470, 298)
+                for i in range(2):
+                    sleep(0.2)
+                    moveTo(1470, 298)
+                    click(1470, 298)
 
+                if tower.currMonkey:
                     gameClick(tower, 1)
-                    press("space")
+
+                press("space")
 
 
 # Activate abilities
