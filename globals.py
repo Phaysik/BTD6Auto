@@ -1,11 +1,10 @@
 #!/usr/bin/env python3
 """
 Author   : Matthew Moore
-Date     : 12/21/2020 
+Date     : 12/21/2020
 Revision : 12/21/2020
 """
 
-from typing import Tuple, Dict
 from pytesseract import pytesseract
 from dataclasses import dataclass
 
@@ -23,26 +22,28 @@ class RGB:
 MOVE: RGB = RGB(r=60, g=200, b=20)
 
 # Screen dimensions
-BOX: Tuple[int, int, int, int] = (0, 0, 1920, 1080)
+BOX: tuple[int, int, int, int] = (0, 0, 1920, 1080)
 
 # Top Upgrade (x, y)
-TOPBOX: Tuple[int, int] = (1488, 489)
+TOPBOX: tuple[int, int] = (1488, 489)
 
 # Middle Upgrade (x, y)
-MIDBOX: Tuple[int, int] = (1488, 636)
+MIDBOX: tuple[int, int] = (1488, 636)
 
 # Bottom Upgrade (x, y)
-LOWBOX: Tuple[int, int] = (1488, 789)
+LOWBOX: tuple[int, int] = (1488, 789)
 
-REGION: Dict[str, Tuple[int, int]] = {"top": TOPBOX, "mid": MIDBOX, "low": LOWBOX}
+REGION: dict[str, tuple[int, int]] = {"top": TOPBOX, "mid": MIDBOX, "low": LOWBOX}
 
-MOVES: Dict[int, str] = {0: ",", 1: ".", 2: "/"}
+MOVES: dict[int, str] = {0: ",", 1: ".", 2: "/"}
 
-MOVESREGION: Dict[int, str] = {0: "top", 1: "mid", 2: "low"}
+MOVESREGION: dict[int, str] = {0: "top", 1: "mid", 2: "low"}
+
+# HERO BOUNDARIES
+ADORA: tuple[int, int, int, int] = (160, 18, 540, 115)
 
 # Towers and their text information when placed on the left side of the screen
-TOWERRIGHTBOXES: Dict[str, Tuple[int, int, int, int]] = {
-    "Hero": (1378, 59, 1513, 96),
+TOWERRIGHTBOXES: dict[str, tuple[int, int, int, int]] = {
     "Dart Monkey": (1307, 52, 1580, 100),
     "Boomerang Monkey": (1278, 54, 1610, 96),
     "Bomb Shooter": (1304, 51, 1587, 101),
@@ -68,17 +69,29 @@ TOWERRIGHTBOXES: Dict[str, Tuple[int, int, int, int]] = {
 }
 
 # A Box surrounding where the Level Up! text shows up
-LEVELDIMENSIONS: Tuple[int, int, int, int] = (815, 531, 1087, 611)
+LEVELDIMENSIONS: tuple[int, int, int, int] = (815, 531, 1087, 611)
 
 # A Box surrounding where the Next button text shows up
-NEXTBUTTON: Tuple[int, int, int, int] = (888, 879, 1063, 948)
+NEXTBUTTON: tuple[int, int, int, int] = (888, 879, 1063, 948)
 
 # A Box surrounding where the Freeplay button text shows up
-FREEPLAYBUTTON: Tuple[int, int, int, int] = (1010, 911, 1233, 966)
+FREEPLAYBUTTON: tuple[int, int, int, int] = (1107, 906, 1331, 966)
 
 # A Box surrounding where the Insta-Monkey! text shows up
-INSTATEXT: Tuple[int, int, int, int] = (733, 624, 1158, 709)
+INSTATEXT: tuple[int, int, int, int] = (733, 624, 1158, 709)
+
+# Location of the info icon for hero selection
+# Click on this to guarantee name even on different hero skins
+INFOICONLOCATION: tuple[int, int] = (1307, 174)
+
+# The button to return from the info icon screen
+BACKBUTTON: tuple[int, int] = (97, 62)
 
 # Path to the tesseract executable
 # Assumes you run a map file from a subdirectory
 pytesseract.tesseract_cmd = "../Tesseract/tesseract.exe"
+
+# The key/combination to signal the exit of the program
+SIGINT: str = "ctrl+c"
+
+DEBUG: bool = False

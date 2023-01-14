@@ -59,8 +59,8 @@ ALCHEMIST: TOWER = TOWER(
     path=[{0: 4, 2: 2}, {0: 1}],
     currUpgrades=[0, 0, 0],
 )
-ALLTOWERS: List[TOWER] = [ADORA, DART, SUPER, TACK, VILLAGE, ALCHEMIST]
-ABILITIES: List[str] = ["1", "3"]
+ALLTOWERS: list[TOWER] = [ADORA, DART, SUPER, TACK, VILLAGE, ALCHEMIST]
+ABILITIES: list[str] = ["1", "3"]
 
 # 40 rounds for non-decreased xp
 def xp() -> None:
@@ -159,7 +159,7 @@ def insta() -> None:
 
         towerManip(-1, ALCHEMIST, ALLTOWERS)
         sleep(0.5)
-        
+
         towerManip(0, ALCHEMIST, ALLTOWERS)
         sleep(0.5)
 

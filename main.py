@@ -5,9 +5,9 @@ Revision : 12/21/2020
 Date     : 12/28/2019
 """
 
-from pyautogui import click, press, moveTo
+from pyautogui import click, moveTo
 from win32gui import EnumWindows, ShowWindow, SetForegroundWindow, GetWindowText
-from typing import List, Optional, Union
+from typing import Optional, Union
 from time import sleep
 from PIL import ImageGrab, Image
 from threading import Thread, currentThread
@@ -16,7 +16,11 @@ from pytesseract import image_to_string
 from fuzzywuzzy.fuzz import partial_ratio, ratio
 from math import sqrt
 from mouse import get_position
+from keyboard import send, add_hotkey
+from os import _exit
 from globals import *
+
+add_hotkey(SIGINT, lambda: _exit(1))
 
 
 @dataclass
@@ -26,12 +30,12 @@ class TOWER:
     name: str
     currMonkey: bool
     key: str
-    path: Optional[List[Dict[int, int]]] = None
-    currUpgrades: Optional[List[int]] = None
+    path: Optional[list[dict[int, int]]] = None
+    currUpgrades: Optional[list[int]] = None
 
 
 class gameThread(Thread):
-    def __init__(self, target, daemon: bool, args: Union[List[TOWER], List[str]]):
+    def __init__(self, target, daemon: bool, args: Union[list[TOWER], list[str]]):
         Thread.__init__(self, target=target, args=[args], daemon=daemon)
         self.do_run = True
 
@@ -50,9 +54,9 @@ def gameClick(location: TOWER, times: int) -> None:
 
 # Press a certain key
 def gamePress(key: str, times: int) -> None:
-    for i in range(times):
+    for _ in range(times):
         sleep(0.2)
-        press(key)
+        send(key)
 
 
 # Click on an empty and safe area of the screen
@@ -67,21 +71,33 @@ def distance(x1: int, x2: int, y1: int, y2: int) -> float:
 
 
 # Place, upgrade, sell towers
-def towerManip(index: int, tower: TOWER, allTowers: List[TOWER]) -> None:
+def towerManip(index: int, tower: TOWER, allTowers: list[TOWER]) -> None:
     if index == -1:
         nextTower(tower)
 
-        name: str = determinePlacement(tower.name)
-        pos: Tuple[int, int] = get_position()
+        name: str = determinePlacement(tower)
+        pos: tuple[int, int] = get_position()
         dist: float = distance(tower.x, pos[0], tower.y, pos[1])
 
-        while ratio(name.lower(), tower.name.lower()) < 80 or dist > 50:
+        while (
+            ratio(name.lower(), tower.name.lower()) < 80
+            and tower.name.lower() not in name.lower()
+        ) or dist > 50:
             gamePress(tower.key, 1)
             gameClick(tower, 2)
 
-            name = determinePlacement(tower.name)
+            name = determinePlacement(tower)
+
+            if DEBUG:
+                print(
+                    f"DEBUG: {name=} {name.lower()} {tower.name.lower()} {tower.name.lower() not in name.lower()}"
+                )
+
             pos = get_position()
             dist = distance(tower.x, pos[0], tower.y, pos[1])
+
+            if DEBUG:
+                print(f"DEBUG: {dist=}")
 
         placing(tower)
     else:
@@ -114,7 +130,7 @@ def towerManip(index: int, tower: TOWER, allTowers: List[TOWER]) -> None:
 
 # Set active window
 def activeWindow() -> None:
-    top_windows: List[str] = []
+    top_windows: list[str] = []
     EnumWindows(windowEnumerationHandler, top_windows)
     for i in top_windows:
         if "bloonstd6" in i[1].lower():
@@ -124,14 +140,14 @@ def activeWindow() -> None:
 
 
 # Get a screenshot of current game state
-def getImage() -> Image:
+def getImage() -> Image.Image:
     sleep(0.1)
     return ImageGrab.grab(BOX)
 
 
 # Determine if an upgrade is available to purchase
 def determineMove(region: str) -> bool:
-    IMAGE: Tuple[int, int, int] = getImage().getpixel(REGION[region])
+    IMAGE: tuple[int, int, int] = getImage().getpixel(REGION[region])
     return (IMAGE[0] >= MOVE.r) and (IMAGE[1] >= MOVE.g) and (IMAGE[2] <= MOVE.b)
 
 
@@ -141,37 +157,55 @@ def determineLevelUp() -> bool:
 
 
 # Get the towers name from an image
-def getTextFromImage(box: Tuple[int, int, int, int]) -> str:
+def getTextFromImage(
+    box: tuple[int, int, int, int],
+    towerXCoords: int = 0,
+    towerYCoords: int = 0,
+    heroTower: bool = False,
+) -> str:
     sleep(0.5)
 
-    return (
-        image_to_string(ImageGrab.grab(box)).replace("\n", "").lower().strip().title()
-    )
+    if heroTower:
+        moveTo(INFOICONLOCATION[0], INFOICONLOCATION[1])
+        click(INFOICONLOCATION[0], INFOICONLOCATION[1])
+        sleep(0.5)
+
+    grabbedImage: Image.Image = ImageGrab.grab(box)
+    grabbedImage.save("test.png")
+
+    if heroTower:
+        moveTo(BACKBUTTON[0], BACKBUTTON[1])
+        click(BACKBUTTON[0], BACKBUTTON[1])
+        sleep(0.5)
+        moveTo(towerXCoords, towerYCoords)
+
+    return image_to_string(grabbedImage).replace("\n", "").lower().strip().title()
 
 
 # Determine if the tower was placed
-def determinePlacement(name: str) -> str:
-    if name == "Adora":
-        return getTextFromImage(TOWERRIGHTBOXES["Hero"])
-    else:
-        return getTextFromImage(TOWERRIGHTBOXES[name])
+def determinePlacement(tower: TOWER) -> str:
+    match tower.name:
+        case "Adora":
+            return getTextFromImage(ADORA, tower.x, tower.y, True)
+        case _:
+            return getTextFromImage(TOWERRIGHTBOXES[tower.name])
 
 
 # Print out what tower is being bought next
 def nextTower(tower: TOWER) -> None:
-    print(f"Waiting on {tower.name} availability.")
+    print(f"\tWaiting on {tower.name} availability.")
 
 
 # Print out what tower is being placed at which (x, y)
 def placing(tower: TOWER) -> None:
-    print(f"Placing {tower.name} at ({tower.x}, {tower.y}).")
+    print(f"\t\tPlacing {tower.name} at ({tower.x}, {tower.y}).")
 
 
 # Print out the what upgrade is getting bought next
 def nextUpgrade(tower: TOWER, currentPath: int) -> None:
     if tower.currUpgrades is not None:
         print(
-            f'Waiting on {tower.name} {"-".join([str(tower.currUpgrades[i] + 1) if (currentPath == i) else (str(tower.currUpgrades[i])) for i in range(len(tower.currUpgrades))])}.'
+            f'\tWaiting on {tower.name} {"-".join([str(tower.currUpgrades[i] + 1) if (currentPath == i) else (str(tower.currUpgrades[i])) for i in range(len(tower.currUpgrades))])}.'
         )
 
 
@@ -179,24 +213,24 @@ def nextUpgrade(tower: TOWER, currentPath: int) -> None:
 def upgrades(tower: TOWER) -> None:
     if tower.currUpgrades is not None:
         print(
-            f'Upgrading {tower.name} to {"-".join([str(i) for i in tower.currUpgrades])}.'
+            f'\t\tUpgrading {tower.name} to {"-".join([str(i) for i in tower.currUpgrades])}.'
         )
 
 
 # Print out what tower is being sold
 def selling(tower: str) -> None:
-    pos: Tuple[int, int] = get_position()
+    pos: tuple[int, int] = get_position()
     print(f"Selling {tower} at ({pos[0]}, {pos[1]})")
 
 
 # Print out what tower is being sold
 def targeting(tower: str) -> None:
-    pos: Tuple[int, int] = get_position()
+    pos: tuple[int, int] = get_position()
     print(f"Changing the targeting of {tower} at ({pos[0]}, {pos[1]})")
 
 
 # Set all towers currUpgrades attribute back to 0
-def defaultUpgrades(towers: List[TOWER]) -> None:
+def defaultUpgrades(towers: list[TOWER]) -> None:
     for monkey in towers:
         if monkey.currUpgrades is not None:
             monkey.currUpgrades = [0, 0, 0]
@@ -208,7 +242,7 @@ def clear():
 
 
 # Deal with any potential level ups as they appear
-def level(towers: List[TOWER]) -> None:
+def level(towers: list[TOWER]) -> None:
     t = currentThread()
 
     while getattr(t, "do_run", True):
@@ -224,27 +258,27 @@ def level(towers: List[TOWER]) -> None:
                 if tower.currMonkey:
                     gameClick(tower, 1)
 
-                press("space")
+                send("space")
 
 
 # Activate abilities
-def gameAbilities(abilities: List[str]) -> None:
+def gameAbilities(abilities: list[str]) -> None:
     t = currentThread()
     while getattr(t, "do_run", True):
         sleep(0.1)
         for number in abilities:
-            press(str(number))
+            send(str(number))
 
 
 # Create and start the leveling up thread
-def levelThread(towers: List[TOWER]) -> gameThread:
+def levelThread(towers: list[TOWER]) -> gameThread:
     levelUp: gameThread = gameThread(level, True, towers)
     levelUp.start()
     return levelUp
 
 
 # Create and start the Adora's abilities thread
-def abilityThread(abilities: List[str]) -> gameThread:
+def abilityThread(abilities: list[str]) -> gameThread:
     ability: gameThread = gameThread(gameAbilities, True, abilities)
     ability.start()
     return ability
@@ -257,7 +291,7 @@ def killThread(thread: gameThread) -> None:
 
 
 # Set the current monkey being upgraded
-def setCurrentMonkey(tower: TOWER, towers: List[TOWER], deselect: bool = False) -> None:
+def setCurrentMonkey(tower: TOWER, towers: list[TOWER], deselect: bool = False) -> None:
     for monkey in towers:
         if tower == monkey and not deselect:
             monkey.currMonkey = True
@@ -274,7 +308,7 @@ def freeplay() -> None:
     while partial_ratio(victory, "Next") < 90:
         victory = getTextFromImage(NEXTBUTTON)
 
-    print("MOAB defeated. Determining if VICTORY screen has appeared.")
+    print("\tMOAB defeated. Determining if VICTORY screen has appeared.")
 
     sleep(1)
     moveTo(1000, 920)
@@ -300,11 +334,11 @@ def freeplay() -> None:
 
 # Restart the game
 def restart(
-    towers: List[TOWER],
+    towers: list[TOWER],
     insta: str = "RESTART",
-    map: Tuple[int, int] = (0, 0),
-    difficulty: Tuple[int, int] = (0, 0),
-    gamemode: Tuple[int, int] = (0, 0),
+    map: tuple[int, int] = (0, 0),
+    difficulty: tuple[int, int] = (0, 0),
+    gamemode: tuple[int, int] = (0, 0),
 ) -> None:
     if insta == "BAD":
         print("Determining if Insta Monkey screen has appeared.")
@@ -314,7 +348,7 @@ def restart(
         while partial_ratio(instaMonkey, "Insta-Monkey!") < 90:
             instaMonkey = getTextFromImage(INSTATEXT)
 
-        print("Insta Monkey acquired. Going into freeplay...")
+        print("\tInsta Monkey acquired. Going into freeplay...")
 
         sleep(1)
         moveTo(881, 437)
