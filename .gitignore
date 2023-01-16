@@ -5,3 +5,4 @@ command.txt
 gui.spec
 build
 Tesseract
+GUI/build/*

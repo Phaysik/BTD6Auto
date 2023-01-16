@@ -9,6 +9,7 @@ main() {
     pip install --user fuzzywuzzy
     pip install --user keyboard
     pip install --user mouse
+    pip install --user pyinstaller
 }
 
 main "$@"

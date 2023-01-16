@@ -2,16 +2,21 @@
 """
 Author   : Matthew Moore
 Date     : 12/19/2020
-Revision : 12/19/2020
+Revision : 01/15/2023
 """
 
 from datetime import date
-from typing import IO, Dict, List, Tuple, Optional, Union
+from typing import IO, TypedDict
 from dataclasses import dataclass
 from keyboard import wait, on_press, KeyboardEvent
 from mouse import on_click, get_position
 from math import sqrt
 from json import load
+import os, sys
+
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from globals import *
 
 
 @dataclass
@@ -22,12 +27,23 @@ class TOWER:
     currMonkey: bool
     key: str
     sold: bool
-    path: Optional[List[Dict[int, int]]] = None
-    currUpgrades: Optional[List[int]] = None
+    path: list[dict[int, int]] | None = None
+    currUpgrades: list[int] | None = None
+
+
+class JSON(TypedDict):
+    authorName: str
+    mapName: str
+    mapScreen: int
+    mapRowCol: list[int]
+    difficulty: str
+    gameType: str
+    gameTypeRowCol: list[int]
+    instaMonkey: bool
 
 
 # Consts
-TOWERSKEY: Dict[str, str] = {
+TOWERSKEY: dict[str, str] = {
     "u": "Hero",
     "q": "Dart Monkey",
     "w": "Boomerang Monkey",
@@ -52,32 +68,37 @@ TOWERSKEY: Dict[str, str] = {
     "k": "Monkey Village",
     "l": "Engineer Monkey",
 }
-MOVESLIST: Dict[str, int] = {",": 0, ".": 1, "/": 2}
+MOVESLIST: dict[str, int] = {",": 0, ".": 1, "/": 2}
 
 # Mutable
-towerList: List[TOWER] = []
-currTower: Union[TOWER, None] = None
-towerName: Union[str, None] = None
-gKey: Union[str, None] = None
-collectPath: Union[Dict[int, int], None] = None
-currentKeys: Union[Dict[int, int], None] = None
+towerList: list[TOWER] = []
+currTower: TOWER | None = None
+towerName: str | None = None
+gKey: str | None = None
+collectPath: dict[int, int] | None = None
+currentKeys: dict[int, int] | None = None
 towerCount: int = 0
 towerPlaceIndex: int = 0
 firstMonkey: str = ""
-stringTowerList: List[str] = []
-monkeyUpgradeOrder: List[Dict[str, int]] = []
-abilities: List[str] = []
-heroName: str = ""
-gameMode: str = ""
+stringTowerList: list[str] = []
+monkeyUpgradeOrder: list[dict[str, int]] = []
+abilities: list[str] = []
+authorName: str = ""
 mapName: str = ""
+mapScreen: int = 0
+mapRowCol: list[int] = []
 difficulty: str = ""
 gameType: str = ""
+gameTypeRowCol: list[int] = []
+instaMonkey: bool = False
 
 # Write the boilerplate header and includes for the program
 def header(f: IO) -> None:
+    global authorName
+
     f.write("#!/usr/bin/env python3\n")
     f.write('"""\n')
-    f.write("Author   : Matthew Moore\n")
+    f.write(f"Author   : {authorName}\n")
     f.write(f'Date     : {date.today().strftime("%m/%d/%Y")}\n')
     f.write(f'Revision : {date.today().strftime("%m/%d/%Y")}\n')
     f.write('"""\n\n')
@@ -89,6 +110,14 @@ def header(f: IO) -> None:
 
 
 def runner(f: IO) -> None:
+    global mapScreen
+    global mapRowCol
+    global instaMonkey
+    global difficulty
+    global mapName
+    global gameType
+    global gameTypeRowCol
+
     f.write("\ndef main() -> None:\n")
     f.write("\titeration: int = 1\n\n")
     f.write("\twhile True:\n")
@@ -105,17 +134,21 @@ def runner(f: IO) -> None:
         for k, v in monkey.items():
             f.write(f"\t\ttowerManip({v}, {k}, ALLTOWERS)\n")
             if v == -2:
-                f.write("\t\tsleep(1)\n")
-                f.write(f"\t\tselling('{k.replace('_', ' ').title()[:-1]}')\n")
-                f.write('\t\tgamePress("backspace", 1)\n')
+                f.write("\t\tsleep(0.5)\n")
+                f.write(
+                    f"\t\tgamePress('backspace', 1, \"{k.replace('_', ' ').title()[:-1]}\")\n"
+                )
             elif v == -3:
-                f.write("\t\tsleep(1)\n")
-                f.write(f"\t\ttargeting('{k.replace('_', ' ').title()[:-1]}')\n")
-                f.write('\t\tgamePress("tab", 1)\n')
+                f.write("\t\tsleep(0.5)\n")
+                f.write(
+                    f"\t\tgamePress('tab', 1, \"{k.replace('_', ' ').title()[:-1]}\")\n"
+                )
             f.write("\t\tsleep(0.5)\n\n")
 
     f.write("\n\t\tfreeplay()\n\n")
-    f.write("\t\trestart(ALLTOWERS)\n\n")
+    f.write(
+        f"\t\trestart(ALLTOWERS, {mapScreen}, {MAPROWCOLPOSITIONS[mapRowCol[0] - 1][mapRowCol[1] - 1]}, {DIFFICULTYPOSITIONS[difficulty]}, {GAMEMODEPOSITIONS[gameTypeRowCol[0] - 1][gameTypeRowCol[1] - 1]}, \"{'BAD' if instaMonkey else 'RESTART'}\")\n\n"
+    )
     f.write("\t\tkillThread(levelUp)\n")
     f.write("\t\tkillThread(ability)\n\n")
     f.write("\t\tsleep(3)\n")
@@ -125,7 +158,7 @@ def runner(f: IO) -> None:
 
 
 def writeTower(
-    x: int, y: int, name: str, key: str, path: Union[List[Dict[int, int]], None], f: IO
+    x: int, y: int, name: str, key: str, path: list[dict[int, int]] | None, f: IO
 ) -> None:
     global towerCount
     global firstMonkey
@@ -145,7 +178,7 @@ def writeTower(
 
     towerString += f'{name.replace(" ", "_").upper()}{towerCount}: TOWER = TOWER(x = {x}, y = {y}, name = \'{name}\', currMonkey = {current}, key = \'{key}\''
 
-    if name not in TOWERSKEY.values():
+    if name == "Hero":
         towerString += ")\n"
     elif isinstance(path, list):
         towerString += f", path = {path}, currUpgrades = [0, 0, 0])\n"
@@ -165,7 +198,6 @@ def input(x: KeyboardEvent) -> None:
     global collectPath
     global currentKeys
     global abilities
-    global heroName
     global currTower
     global monkeyUpgradeOrder
     towerName = None
@@ -182,7 +214,7 @@ def input(x: KeyboardEvent) -> None:
             gKey = key
 
             if x.name == "u":
-                towerName = heroName
+                towerName = "Hero"
             else:
                 towerName = value
 
@@ -298,9 +330,9 @@ def clicker() -> None:
     global monkeyUpgradeOrder
     global towerPlaceIndex
     inList: bool = False
-    pos: Tuple[int, int] = get_position()
-    closest: Union[TOWER, None] = None
-    trueClosest: Union[TOWER, None] = None
+    pos: tuple[int, int] = get_position()
+    closest: TOWER | None = None
+    trueClosest: TOWER | None = None
     smallestDistance: float = 100000
     towerDistance: float = 0
 
@@ -360,22 +392,29 @@ def clicker() -> None:
 
 
 def main() -> None:
-    global heroName
-    global gameMode
+    global authorName
     global mapName
+    global mapScreen
+    global mapRowCol
     global difficulty
     global gameType
+    global gameTypeRowCol
+    global instaMonkey
 
-    json: Dict[str, str] = {}
+    json: JSON | None = None
 
     with open("./config.json") as f:
         json = load(f)
 
-    heroName = json["hero"]
-    gameMode = json["gamemode"]
-    mapName = json["mapname"]
-    difficulty = json["difficulty"]
-    gameType = json["gametype"]
+    if json:
+        authorName = json["authorName"]
+        mapName = json["mapName"]
+        mapScreen = json["mapScreen"]
+        mapRowCol = json["mapRowCol"]
+        difficulty = json["difficulty"]
+        gameType = json["gameType"]
+        gameTypeRowCol = json["gameTypeRowCol"]
+        instaMonkey = json["instaMonkey"]
 
     on_press(input, suppress=False)
     on_click(clicker)
@@ -388,13 +427,13 @@ def main() -> None:
         for tower in towerList:
             writeTower(tower.x, tower.y, tower.name, tower.key, tower.path, f)
 
-        f.write("ALLTOWERS: List[TOWER] = [\n")
+        f.write("ALLTOWERS: list[TOWER] = [\n")
 
         for name in stringTowerList:
             f.write(f"\t{name},\n")
 
         f.write("]\n")
-        f.write(f"ABILITIES: List[str] = {abilities}\n")
+        f.write(f"ABILITIES: list[str] = {abilities}\n")
 
         runner(f)
 

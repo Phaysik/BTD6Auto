@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
 Author   : Matthew Moore
-Revision : 12/21/2020
 Date     : 12/29/2019
+Revision : 01/15/2023
 """
 
 import os
@@ -13,7 +13,7 @@ from main import *
 
 
 # CONSTS
-ADORA: TOWER = TOWER(x=494, y=403, name="Adora", currMonkey=False, key="u")
+Hero: TOWER = TOWER(x=494, y=403, name="Hero", currMonkey=False, key="u")
 DART: TOWER = TOWER(
     x=617,
     y=402,
@@ -59,7 +59,7 @@ ALCHEMIST: TOWER = TOWER(
     path=[{0: 4, 2: 2}, {0: 1}],
     currUpgrades=[0, 0, 0],
 )
-ALLTOWERS: list[TOWER] = [ADORA, DART, SUPER, TACK, VILLAGE, ALCHEMIST]
+ALLTOWERS: list[TOWER] = [Hero, DART, SUPER, TACK, VILLAGE, ALCHEMIST]
 ABILITIES: list[str] = ["1", "3"]
 
 # 40 rounds for non-decreased xp
@@ -80,7 +80,7 @@ def xp() -> None:
         sleep(1)
         gamePress("space", 2)
 
-        towerManip(-1, ADORA, ALLTOWERS)
+        towerManip(-1, Hero, ALLTOWERS)
         sleep(0.5)
 
         towerManip(-1, DART, ALLTOWERS)
@@ -124,7 +124,7 @@ def insta() -> None:
         sleep(1)
         gamePress("space", 2)
 
-        towerManip(-1, ADORA, ALLTOWERS)
+        towerManip(-1, Hero, ALLTOWERS)
         sleep(0.5)
 
         towerManip(-1, DART, ALLTOWERS)
@@ -169,7 +169,14 @@ def insta() -> None:
         towerManip(1, SUPER, ALLTOWERS)
         sleep(0.5)
 
-        restart(ALLTOWERS, "BAD", (522, 261), (602, 401), (605, 567))
+        restart(
+            ALLTOWERS,
+            1,
+            MAPROWCOLPOSITIONS[0][0],
+            DIFFICULTYPOSITIONS["Easy"],
+            GAMEMODEPOSITIONS[0][0],
+            "BAD",
+        )
 
         killThread(levelUp)
         killThread(ability)
@@ -187,7 +194,7 @@ def main() -> None:
         arguments[0].lower() != "x" and arguments[0].lower() != "i"
     ):
         print("Invalid argument. Must be either a 'x' or an 'i'")
-        print("Example: python main.py x")
+        print("Example: python mmes.py x")
         print("x -> Restart after MOAB")
         print("i -> Restart after BAD")
         sys.exit(0)

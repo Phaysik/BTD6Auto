@@ -1,7 +1,10 @@
 {
-    "hero": "Adora",
-    "gamemode": "Freeplay",
-    "mapname": "Monkey Meadow",
+    "authorName": "Matthew Moore",
+    "mapName": "Monkey Meadow",
+    "mapScreen": 1,
+    "mapRowCol": [1, 1],
     "difficulty": "Easy",
-    "gametype": "Primaries Only"
+    "gameType": "Primaries Only",
+    "gameTypeRowCol": [1, 2],
+    "instaMonkey": true
 }
